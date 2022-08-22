@@ -1,106 +1,81 @@
 #include "typeC.h"
 
-Port::Port(string path):devpath(path), data_role(DataRoles::DATA_ROLE_NONE), power_role(PowerRoles::POWER_ROLE_NONE), port_type(PORT_TYPE_NONE) {
+Port::Port(string path):devpath(path), data_role(DATA_ROLE_NONE), power_role(POWER_ROLE_NONE), port_type(PORT_TYPE_NONE) {
 	mapDataRole = {
-		{"[device]\n", DataRoles::DATA_ROLE_DEVICE},
-		{"[host]\n", DataRoles::DATA_ROLE_HOST},
-		{"[host] device\n", DataRoles::DATA_ROLE_DUAL_HOST},
-		{"host [device]\n", DataRoles::DATA_ROLE_DUAL_DEVICE},
+		{"[device]\n", DATA_ROLE_DEVICE},
+		{"[host]\n", DATA_ROLE_HOST},
+		{"[host] device\n", DATA_ROLE_DUAL_HOST},
+		{"host [device]\n", DATA_ROLE_DUAL_DEVICE},
 	};
 	mapPowerRole = {
-		{"[sink]\n", PowerRoles::POWER_ROLE_SINK},
-		{"[source]\n", PowerRoles::POWER_ROLE_SOURCE},
-		{"[source] sink\n", PowerRoles::POWER_ROLE_DUAL_SINK},
-		{"source [sink]\n", PowerRoles::POWER_ROLE_DUAL_SOURCE},
+		{"[sink]\n", POWER_ROLE_SINK},
+		{"[source]\n", POWER_ROLE_SOURCE},
+		{"[source] sink\n", POWER_ROLE_DUAL_SINK},
+		{"source [sink]\n", POWER_ROLE_DUAL_SOURCE},
 	};
 	mapPortType = {
-		{"[sink]\n", PortTypes::PORT_TYPE_SINK},
-		{"[source]\n", PortTypes::PORT_TYPE_SOURCE},
-		{"dual [source] sink\n", PortTypes::PORT_TYPE_DUAL_SOURCE},
-		{"dual source [sink]\n", PortTypes::PORT_TYPE_DUAL_SINK},
+		{"[sink]\n", PORT_TYPE_SINK},
+		{"[source]\n", PORT_TYPE_SOURCE},
+		{"dual [source] sink\n", PORT_TYPE_DUAL_SOURCE},
+		{"dual source [sink]\n", PORT_TYPE_DUAL_SINK},
 	};
-	mapSysFSFunc = {
-		{"data_role", bind(&Port::getSysFSDataRole, this)},
-		{"power_role", bind(&Port::getSysFSPowerRole, this)},
-		{"port_type", bind(&Port::getSysFSPortType, this)},
+	mapVconnSource = {
+		{"yes\n", VCONN_SOURCE_YES},
+		{"no\n", VCONN_SOURCE_NO},
+	};
+	mapPowerOperationMode = {
+		{"default\n", POWER_OPERATION_MODE_DEFAULT},
+		{"1.5A\n", POWER_OPERATION_MODE_1_5A},
+		{"3.0A\n", POWER_OPERATION_MODE_3A},
+		{"usb_power_delivery\n", POWER_OPERATION_MODE_PD},
+	};
+
+	mapSysFs = {
+		{"data_role", {bind(&Port::data_role, this), [&](unsigned int role){data_role=role;}, mapDataRole, true}},
+		{"power_role", {bind(&Port::power_role, this), [&](unsigned int role){power_role=role;}, mapPowerRole, true}},
+		{"port_type", {bind(&Port::port_type, this), [&](unsigned int type){port_type=type;}, mapPortType, true}},
+		{"vconn_source", {bind(&Port::vconn_source, this), [&](unsigned int vconn){vconn_source=vconn;}, mapVconnSource, true}},
+		{"power_operation_mode", {bind(&Port::power_operation_mode, this), [&](unsigned int mode){power_operation_mode=mode;}, mapPowerOperationMode, false}},
 	};
 
 	getSysFS();
-	for (auto p : mapSysFSFunc) {
-		p.second();
+	for (auto p : mapSysFs) {
+		getSysFS(p.first);
 	}
 }
 
-string Port::getDataRole() {
-	return getDataRole(data_role);
-}
-
-string Port::getDataRole(DataRoles role) {
+inline string Port::getString(string name, unsigned int val) {
+	auto map = get<2>(mapSysFs[name]);
 	auto result = find_if(
-          mapDataRole.begin(),
-          mapDataRole.end(),
-          [role](const auto& mo) {return mo.second == role; });
-	if (result != mapDataRole.end()) {
+          map.begin(),
+          map.end(),
+          [&val](const auto& mo) {return mo.second == val; });
+	if (result != map.end()) {
 		return result->first;
 	}
 	return "";
 }
 
-void Port::setDataRole(DataRoles role) {
-	string dataRole = getDataRole(role);
-	if (dataRole.empty()) {
-		return;
+string Port::getValue(string name) {
+	return getString(name, get<0>(mapSysFs[name])());
+}
+
+bool Port::setValue(string name, unsigned int value) {
+	if (!get<3>(mapSysFs[name])) {
+		cout << "RO" << endl;
+		return false;
 	}
-	writeToFile(devpath+"data_role", dataRole); 
-	getSysFS("data_role");
-}
-
-string Port::getPowerRole() {
-	return getPowerRole(power_role);
-}
-
-string Port::getPowerRole(PowerRoles role) {
-	auto result = find_if(
-          mapPowerRole.begin(),
-          mapPowerRole.end(),
-          [role](const auto& mo) {return mo.second == role; });
-	if (result != mapPowerRole.end()) {
-		return result->first;
+	string val = getString(name, value);
+	if (val.empty()) {
+		return false;
 	}
-	return "";
-}
-
-void Port::setPowerRole(PowerRoles role) {
-	string powerRole = getPowerRole(role);
-	if (powerRole.empty()) {
-		return;
+	writeToFile(devpath+name, val);
+	getSysFS(name);
+	if (get<0>(mapSysFs[name])() == value) {
+		cout << "set OK" << endl;
+		return true;
 	}
-	writeToFile(devpath+"power_role", powerRole); 
-	getSysFS("power_role");
-}
-
-string Port::getPortType() {
-	return getPortType(port_type);
-}
-
-string Port::getPortType(PortTypes type) {
-	auto result = find_if(
-          mapPortType.begin(),
-          mapPortType.end(),
-          [type](const auto& mo) {return mo.second == type; });
-	if (result != mapPortType.end()) {
-		return result->first;
-	}
-	return "";
-}
-
-void Port::setPortType(PortTypes type) {
-	string portType = getPortType(type);
-	if (portType.empty()) {
-		return;
-	}
-	writeToFile(devpath+"port_type", portType); 
-	getSysFS("port_type");
+	return false;
 }
 
 void Port::getSysFS() {
@@ -124,41 +99,23 @@ void Port::getSysFS(string file) {
 	if (readFromFile(devpath+file, data)) {
 		sysfsValue[file] = data;
 	}
-	mapSysFSFunc[file]();
-}
-
-void Port::getSysFSDataRole() {
-	if (sysfsValue.find("data_role") != sysfsValue.end() && mapDataRole.find(sysfsValue["data_role"]) != mapDataRole.end()){
-		data_role = mapDataRole[sysfsValue["data_role"]];
+	auto map = get<2>(mapSysFs[file]);
+	auto setter = get<1>(mapSysFs[file]);
+	if (sysfsValue.find(file) != sysfsValue.end() && map.find(sysfsValue[file]) != map.end()) {
+		cout << file << ":" << map[sysfsValue[file]] << endl;
+		setter(map[sysfsValue[file]]);
 	}
 	else {
-		data_role = DATA_ROLE_NONE;
+		setter(DATA_ROLE_NONE);
 	}
-}
-
-void Port::getSysFSPowerRole() {
-	if (sysfsValue.find("power_role") != sysfsValue.end() && mapPowerRole.find(sysfsValue["power_role"]) != mapPowerRole.end()){
-		power_role = mapPowerRole[sysfsValue["power_role"]];
-	}
-	else {
-		power_role = POWER_ROLE_NONE;
-	}
-}
-
-void Port::getSysFSPortType() {
-	if (sysfsValue.find("port_type") != sysfsValue.end() && mapPortType.find(sysfsValue["port_type"]) != mapPortType.end()){
-		port_type = mapPortType[sysfsValue["port_type"]];
-	}
-	else {
-		port_type = PORT_TYPE_NONE;
-	}
-	cout << "port_type:" << port_type << endl;
 }
 
 int main() {
 	Port* p = new Port("./sys/class/typec/port0/");
-	//p->setDataRole(DATA_ROLE_DEVICE);
-	//p->setPowerRole(POWER_ROLE_SOURCE);
-	//p->setPortType(PORT_TYPE_SINK);
+	//p->setValue("data_role", DATA_ROLE_DEVICE);
+	//p->setValue("power_role", POWER_ROLE_SOURCE);
+	//p->setValue("port_type", PORT_TYPE_SINK);
+	//p->setValue("vconn_source", VCONN_SOURCE_YES);
+	//p->setValue("power_operation_mode", POWER_OPERATION_MODE_DEFAULT);
 	return 0;
 }
