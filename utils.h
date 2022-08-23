@@ -1,3 +1,6 @@
+#ifndef UTILS_H_
+#define UTILS_H_
+
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -6,8 +9,8 @@
 
 using namespace std;
 
-using getter = function<int()>;
-using setter = function<void(int)>;
-
 bool readFromFile(string fileToRead, string &usbData);
 template<typename T> bool writeToFile(std::string fileToWrite, T &usbData);
+string &rtrim(string &s);
+
+#endif

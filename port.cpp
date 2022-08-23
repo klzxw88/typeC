@@ -5,7 +5,7 @@ Port::Port(string path)
 	data_role(DATA_ROLE_NONE),
 	power_role(POWER_ROLE_NONE),
 	port_type(PORT_TYPE_NONE),
-	vconn_source(VCONN_SOURCE_NONE),
+	vconn_source(false),
 	power_operation_mode(POWER_OPERATION_MODE_NONE),
 	preferred_role(PREFERRED_ROLE_NONE),
 	usb_power_delivery_revision(POWER_DELIVERY_REVISION_NONE),
@@ -28,10 +28,6 @@ Port::Port(string path)
 		{"[source]\n", PORT_TYPE_SOURCE},
 		{"dual [source] sink\n", PORT_TYPE_DUAL_SOURCE},
 		{"dual source [sink]\n", PORT_TYPE_DUAL_SINK},
-	};
-	mapVconnSource = {
-		{"yes\n", VCONN_SOURCE_YES},
-		{"no\n", VCONN_SOURCE_NO},
 	};
 	mapPowerOperationMode = {
 		{"default\n", POWER_OPERATION_MODE_DEFAULT},
@@ -61,26 +57,27 @@ Port::Port(string path)
 		{"normal\n", ORIENTATION_NORMAL},
 	};
 
-	mapSysFs = {
-		{"data_role", {bind(&Port::data_role, this), [&](int role){data_role=role;}, mapDataRole, true}},
-		{"power_role", {bind(&Port::power_role, this), [&](int role){power_role=role;}, mapPowerRole, true}},
-		{"port_type", {bind(&Port::port_type, this), [&](int type){port_type=type;}, mapPortType, true}},
-		{"vconn_source", {bind(&Port::vconn_source, this), [&](int vconn){vconn_source=vconn;}, mapVconnSource, true}},
-		{"power_operation_mode", {bind(&Port::power_operation_mode, this), [&](int mode){power_operation_mode=mode;}, mapPowerOperationMode, false}},
-		{"preferred_role", {bind(&Port::preferred_role, this), [&](int role){preferred_role=role;}, mapPreferredRole, true}},
-		{"usb_power_delivery_revision", {bind(&Port::usb_power_delivery_revision, this), [&](int rev){usb_power_delivery_revision=rev;}, mapPowerDeliveryRev, false}},
-		{"usb_typec_revision", {bind(&Port::usb_typec_revision, this), [&](int rev){usb_typec_revision=rev;}, mapTypeCRev, false}},
-		{"orientation", {bind(&Port::orientation, this), [&](int ori){orientation=ori;}, mapOrientation, false}},
+	mapSysFsEnum = {
+		{"data_role", {bind(&Port::data_role, this), [&](int role){data_role=static_cast<DATA_ROLES>(role);}, mapDataRole, true}},
+		{"power_role", {bind(&Port::power_role, this), [&](int role){power_role=static_cast<POWER_ROLES>(role);}, mapPowerRole, true}},
+		{"port_type", {bind(&Port::port_type, this), [&](int type){port_type=static_cast<PORT_TYPES>(type);}, mapPortType, true}},
+		{"power_operation_mode", {bind(&Port::power_operation_mode, this), [&](int mode){power_operation_mode=static_cast<POWER_OPERATION_MODES>(mode);}, mapPowerOperationMode, false}},
+		{"preferred_role", {bind(&Port::preferred_role, this), [&](int role){preferred_role=static_cast<PREFERRED_ROLES>(role);}, mapPreferredRole, true}},
+		{"usb_power_delivery_revision", {bind(&Port::usb_power_delivery_revision, this), [&](int rev){usb_power_delivery_revision=static_cast<POWER_DELIVERY_REVISIONS>(rev);}, mapPowerDeliveryRev, false}},
+		{"usb_typec_revision", {bind(&Port::usb_typec_revision, this), [&](int rev){usb_typec_revision=static_cast<TYPEC_REVISIONS>(rev);}, mapTypeCRev, false}},
+		{"orientation", {bind(&Port::orientation, this), [&](int ori){orientation=static_cast<ORIENTATIONS>(ori);}, mapOrientation, false}},
+	};
+	mapSysFsBool = {
+		{"vconn_source", {bind(&Port::vconn_source, this), [&](bool vconn){vconn_source=vconn;}, true}},
 	};
 
-	getSysFS();
-	for (auto p : mapSysFs) {
-		getSysFS(p.first);
-	}
+	getSysFSAll();
 }
-
+/*
 int main() {
 	Port* p = new Port("./sys/class/typec/port0/");
+	cout << p->getValue("vconn_source") << endl;
+	cout << p->getValue("data_role") << endl;
 	//p->setValue("data_role", DATA_ROLE_DEVICE);
 	//p->setValue("power_role", POWER_ROLE_SOURCE);
 	//p->setValue("port_type", PORT_TYPE_SINK);
@@ -88,3 +85,4 @@ int main() {
 	//p->setValue("power_operation_mode", POWER_OPERATION_MODE_DEFAULT);
 	return 0;
 }
+*/
