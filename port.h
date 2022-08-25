@@ -60,26 +60,9 @@ enum ORIENTATIONS {
 };
 
 class Port : public SysFS {
+private:
 	Partner *partner;
 	//Cable *cable;
-	bool vconn_source;
-	DATA_ROLES data_role;
-	POWER_ROLES power_role;
-	PORT_TYPES port_type;
-	POWER_OPERATION_MODES power_operation_mode;
-	PREFERRED_ROLES preferred_role;
-	POWER_DELIVERY_REVISIONS usb_power_delivery_revision;
-	TYPEC_REVISIONS usb_typec_revision;
-	ORIENTATIONS orientation;
-	map<string, int> mapDataRole;
-	map<string, int> mapPowerRole;
-	map<string, int> mapPortType;
-	map<string, int> mapPowerOperationMode;
-	map<string, int> mapPreferredRole;
-	map<string, int> mapPowerDeliveryRev;
-	map<string, int> mapTypeCRev;
-	map<string, int> mapOrientation;
-
 public:
 	Port(string path);
 };

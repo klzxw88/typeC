@@ -40,11 +40,6 @@ public:
 };
 
 class Partner : public SysFS {
-	bool supports_usb_power_delivery;
-	POWER_DELIVERY_REVISIONS usb_power_delivery_revision;
-	ACCESSORY_MODES accessory_mode;
-	PARTNER_TYPES type;
-	int number_of_alternate_modes;
 	Identity identity;
 	map<string, int> mapPowerDeliveryRev;
 	map<string, int> mapAccessoryMode;

@@ -3,54 +3,77 @@
 
 #include <filesystem>
 #include <list>
-#include <map>
-#include <string>
-#include <bitset>
+#include <memory>
 #include "utils.h"
+#include "sysfsvalue.h"
 
 using namespace placeholders;
 
 namespace fs = std::filesystem;
 
-using getterEnum = function<int()>;
-using setterEnum = function<void(int)>;
-using getterInt = function<int()>;
-using setterInt = function<void(int)>;
-using getterString = function<string()>;
-using setterString = function<void(string)>;
-using getterBool = function<bool()>;
-using setterBool = function<void(bool)>;
-using getterBitset = function<bitset<32>()>;
-using setterBitset = function<void(bitset<32>)>;
-
 class SysFS {
+private:
+	map<string, string> sysfsValue;
+	map<string, shared_ptr<ISysFSValue>> mapSysValue;
+
 protected:
-	map<string, tuple<getterEnum, setterEnum, map<string, int>, bool>> mapSysFsEnum;
-	map<string, tuple<getterString, setterString, bool>> mapSysFsString;
-	map<string, tuple<getterBool, setterBool, bool>> mapSysFsBool;
-	map<string, tuple<getterInt, setterInt, bool>> mapSysFsInt;
-	map<string, tuple<getterBitset, setterBitset, bool>> mapSysFsBitset;
 	list<string> subDirs;
 	string devpath;
-	map<string, string> sysfsValue;
 
 	void getSysFSAll();
 	void getSysFSAll(string path);
 	void getSysFS(string file);
 	void getSysFS(string file, string path);
-
-	string getString(string name, int val);
-	string getString(string name, string val);
 public:
 	SysFS(string path);
+	~SysFS() = default;
 
 	string getValue(string name);
-	bool setValue(string name, int value);
-	bool setValue(string name, int value, string path);
-	bool setValue(string name, string value);
-	bool setValue(string name, string value, string path);
-	bool setValue(string name, bool value);
-	bool setValue(string name, bool value, string path);
+	void addMap(ISysFSValue* iSysFSValue) { mapSysValue.insert(make_pair(iSysFSValue->getName(), shared_ptr<ISysFSValue>(iSysFSValue))); };
+	template<typename T> bool setValue(string name, T value);
+	template<typename T> bool setValue(string name, T value, string path);
 };
+
+template<typename T>
+bool SysFS::setValue(string name, T value) {
+	return setValue(name, value, devpath);
+}
+
+template<typename T>
+bool SysFS::setValue(string name, T value, string path) {
+	if (!mapSysValue[name]->writable()) {
+		return false;
+	}
+
+	string val;
+	if constexpr (is_same_v<T, string>) {
+		val = value;
+	}
+	else if constexpr (is_same_v<T, bitset<32>>) {
+		return "";
+	}
+	else if constexpr (is_same_v<T, bool>) {
+		if (value) {
+			val = "yes\n";
+		}
+		else {
+			val = "no\n";
+		}
+	}
+	else if (mapSysValue[name]->empty()) {
+		val = to_string(value);
+	}
+	else {
+		val = mapSysValue[name]->getString(value);
+	}
+
+	writeToFile(path+name, val);
+	cout << "writeToFile(" << path+name << "," << val << ")" << endl;
+	getSysFS(name, path);
+	if (mapSysValue[name]->getString() == val) {
+		return true;
+	}
+	return false;
+}
 
 #endif
