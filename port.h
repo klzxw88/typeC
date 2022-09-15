@@ -2,6 +2,7 @@
 #define PORT_H_
 
 #include <algorithm>
+#include "common.h"
 #include "sysfs.h"
 #include "partner.h"
 

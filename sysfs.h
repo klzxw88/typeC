@@ -14,10 +14,10 @@ namespace fs = std::filesystem;
 class SysFS {
 private:
 	map<string, string> sysfsValue;
-	map<string, shared_ptr<ISysFSValue>> mapSysValue;
 
 protected:
 	list<string> subDirs;
+	map<string, shared_ptr<ISysFSValue>> mapSysValue;
 	string devpath;
 
 	void getSysFSAll();
