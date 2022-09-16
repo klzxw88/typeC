@@ -45,6 +45,6 @@ void SysFS::getSysFS(string file, string path) {
 	}
 
 	if (mapSysValue.find(file) != mapSysValue.end()) {
-		mapSysValue[file]->set(sysfsValue[file]);
+		mapSysValue[file]->setString(sysfsValue[file]);
 	}
 }

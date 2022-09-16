@@ -2,6 +2,7 @@
 #define SYSFSVALUE_H_
 
 #include <bitset>
+#include <ctype.h>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -20,7 +21,7 @@ public:
 	virtual bool empty() = 0;
 	virtual string getString() = 0;
 	virtual string getString(int i) = 0;
-	virtual void set(string s) = 0;
+	virtual void setString(string s) = 0;
 	bool writable() { return isWritable; };
 	string getName() { return name; };
 };
@@ -36,7 +37,7 @@ public:
 
 	T get() { return value; };
 	void set(T val) { value = val; };
-	void set(string s) override;
+	void setString(string s) override;
 	void add(string s, T t) { table.insert(make_pair(s,t)); };
 	bool empty() override { return table.empty(); };
 	string getString() override;
@@ -44,13 +45,20 @@ public:
 };
 
 template<typename T>
-void SysFSValue<T>::set(string s) {
+void SysFSValue<T>::setString(string s) {
 	if constexpr (is_same_v<T, string>) {
 		value = s;
 	}
 	else if (is_same_v<T, bitset<32>>) {
 		if (s[0] == '0' && s[1] == 'x') {
 			s = s.substr(2, s.length()-2);
+			stringstream ss;
+			unsigned int iVal;
+			ss << std::hex << s;
+			ss >> iVal;
+			value = iVal;
+		}
+		else if(std::all_of(s.begin(), s.end()-2, ::isxdigit)) {
 			stringstream ss;
 			unsigned int iVal;
 			ss << std::hex << s;
@@ -67,7 +75,16 @@ void SysFSValue<T>::set(string s) {
 		}
 	}
 	else if (table.empty()) {
-		value = stoi(s);
+		if(std::all_of(s.begin(), s.end()-2, ::isxdigit)) {
+			stringstream ss;
+			unsigned int iVal;
+			ss << std::hex << s;
+			ss >> iVal;
+			value = iVal;
+		}
+		else {
+			value = stoi(s);
+		}
 	}
 	else {
 		value = table[s];

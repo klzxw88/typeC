@@ -68,7 +68,6 @@ bool SysFS::setValue(string name, T value, string path) {
 	}
 
 	writeToFile(path+name, val);
-	cout << "writeToFile(" << path+name << "," << val << ")" << endl;
 	getSysFS(name, path);
 	if (mapSysValue[name]->getString() == val) {
 		return true;

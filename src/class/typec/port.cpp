@@ -73,7 +73,6 @@ Port::Port(string path)	: SysFS(path) {
 
 	getSysFSAll();
 }
-
 /*
 int main() {
 	Port* p = new Port("./sys/class/typec/port0/");
@@ -88,12 +87,31 @@ int main() {
 	cout << "usb_typec_revision:" << p->getValue("usb_typec_revision") << endl;
 	cout << "orientation:" << p->getValue("orientation") << endl;
 	cout << "------" << endl;
-	//p->setValue("data_role", DATA_ROLE_DEVICE);
-	//p->setValue("vconn_source", false);
-	//p->setValue("power_role", POWER_ROLE_SOURCE);
-	//p->setValue("port_type", PORT_TYPE_SINK);
-	//p->setValue("power_operation_mode", POWER_OPERATION_MODE_DEFAULT);
-	//p->setValue("preferred_role", PREFERRED_ROLE_SINK);
+	p->setValue("data_role", DATA_ROLE_HOST);
+	p->setValue("vconn_source", false);
+	p->setValue("power_role", POWER_ROLE_SOURCE);
+	p->setValue("port_type", PORT_TYPE_SOURCE);
+	p->setValue("power_operation_mode", POWER_OPERATION_MODE_DEFAULT);
+	p->setValue("preferred_role", PREFERRED_ROLE_SINK);
+	cout << "------" << endl;
+	cout << "data_role:" << p->getValue("data_role") << endl;
+	cout << "vconn_source:" << p->getValue("vconn_source") << endl;
+	cout << "power_role:" << p->getValue("power_role") << endl;
+	cout << "port_type:" << p->getValue("port_type") << endl;
+	cout << "power_operation_mode:" << p->getValue("power_operation_mode") << endl;
+	cout << "preferred_role:" << p->getValue("preferred_role") << endl;
+	cout << "------" << endl;
+	p->setValue("data_role", DATA_ROLE_DEVICE);
+	p->setValue("vconn_source", true);
+	p->setValue("power_role", POWER_ROLE_DUAL_SOURCE);
+	p->setValue("port_type", PORT_TYPE_DUAL_SOURCE);
+	p->setValue("preferred_role", PREFERRED_ROLE_SOURCE);
+	cout << "------" << endl;
+	cout << "data_role:" << p->getValue("data_role") << endl;
+	cout << "vconn_source:" << p->getValue("vconn_source") << endl;
+	cout << "power_role:" << p->getValue("power_role") << endl;
+	cout << "port_type:" << p->getValue("port_type") << endl;
+	cout << "preferred_role:" << p->getValue("preferred_role") << endl;
 	cout << "------" << endl;
 	delete p;
 	return 0;
