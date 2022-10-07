@@ -5,6 +5,8 @@
 #include "sysfs.h"
 
 class Plug : public SysFS {
+private:
+	const string name = "typec_plug";
 public:
 	Plug(string path);
 };

@@ -5,6 +5,8 @@
 #include "sysfs.h"
 
 class Identity : public SysFS {
+private:
+	const string name = "identity";
 public:
 	bitset<32> id_header;
 	bitset<32> cert_stat;

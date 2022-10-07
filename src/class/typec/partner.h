@@ -26,6 +26,8 @@ enum PARTNER_TYPES {
 };
 
 class Partner : public SysFS {
+private:
+	const string name = "typec_partner";
 	shared_ptr<Identity> identity;
 
 public:

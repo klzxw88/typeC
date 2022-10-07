@@ -22,6 +22,8 @@ enum PLUG_TYPES {
 };
 
 class Cable : public SysFS {
+private:
+	const string name = "typec_cable";
 	shared_ptr<Identity> identity;
 
 public:

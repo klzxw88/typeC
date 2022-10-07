@@ -49,6 +49,9 @@ bool SysFS::setValue(string name, T value, string path) {
 	if constexpr (is_same_v<T, string>) {
 		val = value;
 	}
+	else if constexpr (is_same_v<T, const char*>) {
+		val = value;
+	}
 	else if constexpr (is_same_v<T, bitset<32>>) {
 		return "";
 	}

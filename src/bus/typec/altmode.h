@@ -4,9 +4,10 @@
 #include <algorithm>
 #include "common.h"
 #include "sysfs.h"
-#include "identity.h"
 
 class AlternateMode : public SysFS {
+private:
+	const string name = "typec_alternate_mode";
 public:
 	AlternateMode(string path);
 };

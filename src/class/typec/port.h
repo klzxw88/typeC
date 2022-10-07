@@ -62,6 +62,7 @@ enum ORIENTATIONS {
 
 class Port : public SysFS {
 private:
+	const string name = "typec_port";
 	Partner *partner;
 	//Cable *cable;
 public:
