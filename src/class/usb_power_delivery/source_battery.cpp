@@ -18,8 +18,10 @@ SourceBattery::SourceBattery(string path)
 }
 /*
 int main() {
-	Plug* p = new Plug("./sys/class/typec/port0/port0-plug0/");
-	cout << p->getValue("number_of_alternate_modes") << endl;
+	SourceBattery* p = new SourceBattery("./sys/class/typec/port0/usb_power_delivery/source_capabilities/3:battery/");
+	cout << "maximum_voltage: " <<  p->getValue("maximum_voltage") << endl;
+	cout << "minimum_voltage: " << p->getValue("minimum_voltage") << endl;
+	cout << "maximum_power: " << p->getValue("maximum_power") << endl;
 	delete p;
 	return 0;
 }

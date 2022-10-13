@@ -18,8 +18,10 @@ SinkPPS::SinkPPS(string path)
 }
 /*
 int main() {
-	Plug* p = new Plug("./sys/class/typec/port0/port0-plug0/");
-	cout << p->getValue("number_of_alternate_modes") << endl;
+	SinkPPS* p = new SinkPPS("./sys/class/typec/port0/usb_power_delivery/sink_capabilities/4:pps/");
+	cout << "maximum_voltage: " <<  p->getValue("maximum_voltage") << endl;
+	cout << "minimum_voltage: " << p->getValue("minimum_voltage") << endl;
+	cout << "maximum_current: " << p->getValue("maximum_current") << endl;
 	delete p;
 	return 0;
 }

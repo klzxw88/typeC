@@ -14,14 +14,18 @@ class ISysFSValue {
 private:
 	string name;
 	bool isWritable;
+protected:
+	bool isHit;
 public:
-	ISysFSValue(string n, bool b) : name(n), isWritable(b) {};
+	ISysFSValue(string n, bool b) : name(n), isWritable(b), isHit(false) {};
 	virtual ~ISysFSValue() {};
 
 	virtual bool empty() = 0;
 	virtual string getString() = 0;
 	virtual string getString(int i) = 0;
 	virtual void setString(string s) = 0;
+	void setHit() { isHit = true; };
+	bool getHit() { return isHit; };
 	bool writable() { return isWritable; };
 	string getName() { return name; };
 };

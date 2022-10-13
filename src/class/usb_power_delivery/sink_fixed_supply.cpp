@@ -42,7 +42,7 @@ SinkFixedSupply::SinkFixedSupply(string path)
 }
 /*
 int main() {
-	SinkFixedSupply* p = new SinkFixedSupply("./sys/class/typec/port0/usb_power_delivery/sink_capabilitie/1:fixed_supply/");
+	SinkFixedSupply* p = new SinkFixedSupply("./sys/class/typec/port0/usb_power_delivery/sink_capabilities/1:fixed_supply/");
 	cout << "dual_role_power: " <<  p->getValue("dual_role_power") << endl;
 	cout << "usb_suspend_supported: " << p->getValue("usb_suspend_supported") << endl;
 	cout << "unconstrained_power: " << p->getValue("unconstrained_power") << endl;

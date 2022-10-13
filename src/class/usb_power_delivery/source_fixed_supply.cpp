@@ -3,8 +3,8 @@
 SourceFixedSupply::SourceFixedSupply(string path)
 	: SysFS(path) {
 	// dule_role_power
-	SysFSValue<bool>* dule_role_power = new SysFSValue<bool>("dule_role_power", false);
-	addMap(dule_role_power);
+	SysFSValue<bool>* dual_role_power = new SysFSValue<bool>("dual_role_power", false);
+	addMap(dual_role_power);
 
 	// usb_suspend_supported
 	SysFSValue<bool>* usb_suspend_supported = new SysFSValue<bool>("usb_suspend_supported", false);
@@ -16,7 +16,7 @@ SourceFixedSupply::SourceFixedSupply(string path)
 
 	// usb_communication_capable
 	SysFSValue<bool>* usb_communication_capable = new SysFSValue<bool>("usb_communication_capable", false);
-	addMap(unconstrained_power);
+	addMap(usb_communication_capable);
 
 	// dual_role_data
 	SysFSValue<bool>* dual_role_data = new SysFSValue<bool>("dual_role_data", false);
@@ -38,8 +38,15 @@ SourceFixedSupply::SourceFixedSupply(string path)
 }
 /*
 int main() {
-	Plug* p = new Plug("./sys/class/typec/port0/port0-plug0/");
-	cout << p->getValue("number_of_alternate_modes") << endl;
+	SourceFixedSupply* p = new SourceFixedSupply("./sys/class/typec/port0/usb_power_delivery/source_capabilities/1:fixed_supply/");
+	cout << "dual_role_power: " <<  p->getValue("dual_role_power") << endl;
+	cout << "usb_suspend_supported: " << p->getValue("usb_suspend_supported") << endl;
+	cout << "unconstrained_power: " << p->getValue("unconstrained_power") << endl;
+	cout << "usb_communication_capable: " << p->getValue("usb_communication_capable") << endl;
+	cout << "dual_role_data: " << p->getValue("dual_role_data") << endl;
+	cout << "unchunked_extended_messages_supported: " << p->getValue("unchunked_extended_messages_supported") << endl;
+	cout << "maximum_current: " << p->getValue("maximum_current") << endl;
+	cout << "voltage: " << p->getValue("voltage") << endl;
 	delete p;
 	return 0;
 }

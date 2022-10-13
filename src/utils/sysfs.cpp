@@ -18,6 +18,12 @@ void SysFS::getSysFSAll() {
 }
 
 void SysFS::getSysFSAll(string path) {
+	if (!fs::exists(path)) {
+		return;
+	}
+	if (!fs::is_directory(path)) {
+		return;
+	}
 	for (const auto & file : fs::directory_iterator(path)) {
 		string data;
 		fs::path p;
@@ -39,6 +45,9 @@ void SysFS::getSysFS(string file) {
 }
 
 void SysFS::getSysFS(string file, string path) {
+	if (!fs::exists(path+file)) {
+		return;
+	}
 	string data;
 	if (readFromFile(path+file, data)) {
 		sysfsValue[file] = data;
@@ -46,5 +55,6 @@ void SysFS::getSysFS(string file, string path) {
 
 	if (mapSysValue.find(file) != mapSysValue.end()) {
 		mapSysValue[file]->setString(sysfsValue[file]);
+		mapSysValue[file]->setHit();
 	}
 }
