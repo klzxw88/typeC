@@ -58,3 +58,13 @@ void SysFS::getSysFS(string file, string path) {
 		mapSysValue[file]->setHit();
 	}
 }
+
+Json::Value SysFS::toJson() {
+	Json::Value root;
+	for (const auto& [key, value] : mapSysValue) {
+		if (mapSysValue[key]->getHit()) {
+			root[key] = getValue(key);
+		}
+	}
+	return root;
+}

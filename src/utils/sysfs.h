@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <list>
 #include <memory>
+#include <json/json.h>
 #include "utils.h"
 #include "sysfsvalue.h"
 
@@ -20,7 +21,6 @@ protected:
 	map<string, shared_ptr<ISysFSValue>> mapSysValue;
 	string devpath;
 
-	void getSysFSAll();
 	void getSysFSAll(string path);
 	void getSysFS(string file);
 	void getSysFS(string file, string path);
@@ -28,8 +28,11 @@ public:
 	SysFS(string path);
 	~SysFS() = default;
 
+	string getDevPath() { return devpath; };
 	string getValue(string name);
+	void getSysFSAll();
 	void addMap(ISysFSValue* iSysFSValue) { mapSysValue.insert(make_pair(iSysFSValue->getName(), shared_ptr<ISysFSValue>(iSysFSValue))); };
+	Json::Value toJson();
 	template<typename T> bool setValue(string name, T value);
 	template<typename T> bool setValue(string name, T value, string path);
 };

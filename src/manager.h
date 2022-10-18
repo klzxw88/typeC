@@ -1,22 +1,25 @@
 #ifndef MANAGER_H_
 #define MANAGER_H_
 
-#include <list>
 #include <string>
+#include <map>
 #include <algorithm>
-#include "port.h"
+
+#include "device_handler.h"
 
 #define ROOT_PATH "./sys/class/typec"
+
+using namespace std;
 
 class Manager {
 private:
 	string devpath;
-	list<Port> ports;
+	map<string, shared_ptr<IDeviceHandler>> deviceHandlers;
+
+	void processUdevEvent(UdevEvent* pUE);
 
 public:
 	Manager(string path);
-	void registerPort(string path);
-	void unregisterPort(string path);
 };
 
 #endif
