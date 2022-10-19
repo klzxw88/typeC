@@ -6,6 +6,8 @@ PKG_CHECK_MODULES(GLIB REQUIRED glib-2.0)
 pkg_check_modules(UDEV REQUIRED libudev)
 pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -g")
+
 set(BIN_NAME typeC)
 file(GLOB_RECURSE UTILS_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.cpp)
 file(GLOB_RECURSE UDEV_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/udev/*.cpp)

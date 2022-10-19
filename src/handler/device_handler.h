@@ -22,11 +22,13 @@ public:
 template <typename T>
 class DeviceHandler : public IDeviceHandler {
 private:
-	std::list<T*> devices;
+	std::list<shared_ptr<T>> devices;
 	std::recursive_mutex mtx;
 public:
 	DeviceHandler(string n):IDeviceHandler(n) {};
-	~DeviceHandler() {};
+	~DeviceHandler() {
+		devices.clear();
+	};
 	bool processUdevEvent(UdevEvent* pUE) override;
 };
 
@@ -35,15 +37,17 @@ bool DeviceHandler<T>::processUdevEvent(UdevEvent* pUE) {
 	if (pUE->getDevAttribute(DEVTYPE) == name) {
 		string devpath = pUE->getDevAttribute(DEVPATH);
 		std::lock_guard<std::recursive_mutex> lock(mtx);
-		auto device = find_if(devices.begin(), devices.end(), [&devpath](T* d) { return (d->getDevPath() == devpath); });
-		if (pUE->getDevAttribute(ACTION) == DEVICE_REMOVE) {	
-			devices.remove(*device);
-			return true;
+		auto device = find_if(devices.begin(), devices.end(), [&devpath](auto d) { return (d->getDevPath() == devpath); });
+		if (pUE->getDevAttribute(ACTION) == DEVICE_REMOVE) {
+			if (devices.end() != device) {
+				devices.remove(*device);
+				return true;
+			}
+			return false;
 		}
 		else if (pUE->getDevAttribute(ACTION) == DEVICE_ADD) {
-			if (*device == nullptr) {
-				T* d = new T(devpath);
-				devices.push_back(d);
+			if (devices.end() == device) {
+				devices.push_back(make_shared<T>(devpath));
 			}
 			else {
 				(*device)->getSysFSAll();
@@ -51,8 +55,11 @@ bool DeviceHandler<T>::processUdevEvent(UdevEvent* pUE) {
 			return true;
 		}
 		else if (pUE->getDevAttribute(ACTION) == DEVICE_CHANGE) {
-			(*device)->getSysFSAll();
-			return true;
+			if (devices.end() != device) {
+				(*device)->getSysFSAll();
+				return true;
+			}
+			return false;
 		}
 	}
 	return false;

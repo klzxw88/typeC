@@ -39,7 +39,10 @@ Partner::Partner(string path)
 	addMap(type);
 
 	getSysFSAll();
-	identity = make_shared<Identity>(devpath+"identity/");
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {
@@ -49,12 +52,6 @@ int main() {
 	cout << p->getValue("usb_power_delivery_revision") << endl;
 	cout << p->getValue("accessory_mode") << endl;
 	cout << p->getValue("supports_usb_power_delivery") << endl;
-	cout << p->getIdentityValue("id_header") << endl;
-	cout << p->getIdentityValue("cert_stat") << endl;
-	cout << p->getIdentityValue("product") << endl;
-	cout << p->getIdentityValue("product_type_vdo1") << endl;
-	cout << p->getIdentityValue("product_type_vdo2") << endl;
-	cout << p->getIdentityValue("product_type_vdo3") << endl;
 	delete p;
 	return 0;
 }

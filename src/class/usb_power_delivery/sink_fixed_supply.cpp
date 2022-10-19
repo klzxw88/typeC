@@ -39,6 +39,10 @@ SinkFixedSupply::SinkFixedSupply(string path)
 	addMap(operational_current);
 
 	getSysFSAll();
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {

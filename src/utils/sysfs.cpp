@@ -68,3 +68,11 @@ Json::Value SysFS::toJson() {
 	}
 	return root;
 }
+
+Json::Value SysFS::sysFStoJson() {
+	Json::Value root;
+	for (const auto& [key, value] : sysfsValue) {
+		root[key] = value;
+	}
+	return root;
+}

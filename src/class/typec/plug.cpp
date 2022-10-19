@@ -7,6 +7,10 @@ Plug::Plug(string path)
 	addMap(number_of_alternate_modes);
 
 	getSysFSAll();
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {

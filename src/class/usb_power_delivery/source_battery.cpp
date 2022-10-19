@@ -15,6 +15,10 @@ SourceBattery::SourceBattery(string path)
 	addMap(maximum_power);
 
 	getSysFSAll();
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {

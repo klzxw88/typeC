@@ -4,7 +4,6 @@
 #include <algorithm>
 #include "common.h"
 #include "sysfs.h"
-#include "identity.h"
 
 enum CABLE_TYPES {
 	CABLE_TYPE_NOT_CABLE = 120,
@@ -24,12 +23,9 @@ enum PLUG_TYPES {
 class Cable : public SysFS {
 private:
 	const string name = "typec_cable";
-	shared_ptr<Identity> identity;
 
 public:
 	Cable(string path);
-
-	string getIdentityValue(string name) { return identity->getValue(name); };
 };
 
 #endif

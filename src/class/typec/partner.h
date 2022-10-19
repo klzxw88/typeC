@@ -4,7 +4,6 @@
 #include <algorithm>
 #include "common.h"
 #include "sysfs.h"
-#include "identity.h"
 
 enum ACCESSORY_MODES {
 	ACCESSORY_MODE_NONE = 100,
@@ -28,12 +27,9 @@ enum PARTNER_TYPES {
 class Partner : public SysFS {
 private:
 	const string name = "typec_partner";
-	shared_ptr<Identity> identity;
 
 public:
 	Partner(string path);
-
-	string getIdentityValue(string name) { return identity->getValue(name); };
 };
 
 #endif

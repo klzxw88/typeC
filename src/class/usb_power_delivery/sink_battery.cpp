@@ -15,6 +15,10 @@ SinkBattery::SinkBattery(string path)
 	addMap(operational_power);
 
 	getSysFSAll();
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {

@@ -19,10 +19,14 @@ DisplayPort::DisplayPort(string path)
 	addMap(pin_assignment);
 
 	getSysFSAll();
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {
-	DisplayPort* p = new DisplayPort("./sys/bus/typec/devices/1-1/displayport/");
+	DisplayPort* p = new DisplayPort("./sys/bus/typec/devices/1-1/mode1/displayport/");
 	cout << p->getValue("configuration") << endl;
 	cout << p->getValue("pin_assignment") << endl;
 	p->setValue("configuration", DP_CONF_DUAL_USB);

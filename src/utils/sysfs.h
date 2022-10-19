@@ -28,11 +28,12 @@ public:
 	SysFS(string path);
 	~SysFS() = default;
 
+	void getSysFSAll();
 	string getDevPath() { return devpath; };
 	string getValue(string name);
-	void getSysFSAll();
 	void addMap(ISysFSValue* iSysFSValue) { mapSysValue.insert(make_pair(iSysFSValue->getName(), shared_ptr<ISysFSValue>(iSysFSValue))); };
 	Json::Value toJson();
+	Json::Value sysFStoJson();
 	template<typename T> bool setValue(string name, T value);
 	template<typename T> bool setValue(string name, T value, string path);
 };

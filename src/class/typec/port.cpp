@@ -72,8 +72,10 @@ Port::Port(string path)	: SysFS(path) {
 	// select_usb_power_delivery
 
 	getSysFSAll();
-
-	//cout << toJson().toStyledString() << endl;
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {

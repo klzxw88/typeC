@@ -16,10 +16,10 @@ private:
 	string devpath;
 	map<string, shared_ptr<IDeviceHandler>> deviceHandlers;
 
-	void processUdevEvent(UdevEvent* pUE);
-
 public:
 	Manager(string path);
+	void processUdevEvent(UdevEvent* pUE);
+
 };
 
 #endif

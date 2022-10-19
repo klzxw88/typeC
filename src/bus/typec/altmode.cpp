@@ -24,10 +24,14 @@ AlternateMode::AlternateMode(string path)
 	addMap(vdo);
 
 	getSysFSAll();
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {
-	AlternateMode* p = new AlternateMode("./sys/bus/typec/devices/1-1/");
+	AlternateMode* p = new AlternateMode("./sys/bus/typec/devices/1-1/mode1/");
 	cout << p->getValue("active") << endl;
 	cout << p->getValue("description") << endl;
 	cout << p->getValue("mode") << endl;

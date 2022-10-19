@@ -32,7 +32,11 @@ Cable::Cable(string path)
 	addMap(number_of_alternate_modes);
 
 	getSysFSAll();
-	identity = make_shared<Identity>(devpath+"identity/");
+//	identity = make_shared<Identity>(devpath+"identity/");
+/*
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
 /*
 int main() {

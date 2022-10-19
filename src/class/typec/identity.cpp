@@ -27,4 +27,21 @@ Identity::Identity(string path)
 	addMap(product_type_vdo3);
 
 	getSysFSAll();
+/*	
+	cout << toJson().toStyledString() << endl;
+	cout << sysFStoJson().toStyledString() << endl;
+*/
 }
+/*
+int main() {
+	Partner* p = new Partner("./sys/class/typec/port0/port0-partner/identity/");
+	cout << p->getValue("id_header") << endl;
+	cout << p->getValue("cert_stat") << endl;
+	cout << p->getValue("product") << endl;
+	cout << p->getValue("product_type_vdo1") << endl;
+	cout << p->getValue("product_type_vdo2") << endl;
+	cout << p->getValue("product_type_vdo3") << endl;
+	delete p;
+	return 0;
+}
+*/
