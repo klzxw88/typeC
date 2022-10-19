@@ -88,7 +88,6 @@ void UdevListener::enumerate_devices() {
         return;
     }
     enumerate_subsystem_devices("usb");
-    enumerate_subsystem_devices("sound");
     enumerate_subsystem_devices("typec");
 }
 
@@ -110,17 +109,14 @@ void UdevListener::threadStart() {
         goto out;
     }
 
-    //if (udev_monitor_filter_add_match_subsystem_devtype(monitor, "usb", "usb_device") < 0 ||
-    //        udev_monitor_filter_add_match_subsystem_devtype(monitor, "sound", NULL) < 0) {
     if (udev_monitor_filter_add_match_subsystem_devtype(monitor, "usb", "usb_device") < 0 ||
-            udev_monitor_filter_add_match_subsystem_devtype(monitor, "sound", NULL) < 0 ||
             udev_monitor_filter_add_match_subsystem_devtype(monitor, "typec", NULL) < 0) {
 		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " filter failed" << std::endl;
         goto out;
     }
 
-    //if (udev_monitor_set_receive_buffer_size(monitor, 128*1024*1024) < 0) {
-    if (udev_monitor_set_receive_buffer_size(monitor, 128*1024) < 0) {
+	//if (udev_monitor_set_receive_buffer_size(monitor, 128*1024*1024) < 0) {
+	if (udev_monitor_set_receive_buffer_size(monitor, 128*1024) < 0) {
 		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " failed to set buffer size" << std::endl;
         goto out;
     }

@@ -17,6 +17,7 @@ public:
 	IDeviceHandler(string n):name(n) {};
 	virtual ~IDeviceHandler() {};
 	virtual bool processUdevEvent(UdevEvent* pUE) = 0;
+	virtual Json::Value getList() = 0;
 };
 
 template <typename T>
@@ -30,6 +31,7 @@ public:
 		devices.clear();
 	};
 	bool processUdevEvent(UdevEvent* pUE) override;
+	Json::Value getList() override;
 };
 
 template <typename T>
@@ -65,8 +67,13 @@ bool DeviceHandler<T>::processUdevEvent(UdevEvent* pUE) {
 	return false;
 }
 
-	// getList();
+template <typename T>
+Json::Value DeviceHandler<T>::getList() {
+	Json::Value lists;
+	for (auto d : devices) {
+		lists.append(d->toJson());
+	}
+	return lists;
+}
+
 #endif
-
-
-

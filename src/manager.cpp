@@ -16,6 +16,7 @@
 #include "sink_variable_supply.h"
 #include "sink_battery.h"
 #include "sink_pps.h"
+#include "udev_listener.h"
 
 Manager::Manager(string path) : devpath(path) {
 	deviceHandlers.insert(make_pair("typec_port", shared_ptr<IDeviceHandler>(new DeviceHandler<Port>("typec_port"))));
@@ -71,16 +72,35 @@ void Manager::processUdevEvent(UdevEvent* pUE) {
 		deviceHandlers[type]->processUdevEvent(pUE);
 	}
 }
-/*
-void Manager::getList(string type) {
+
+Json::Value Manager::getList(string type) {
 	Json::Value root;
-	if (deviceHandlers.find(type) != deviceHandlers.end()) {
-		root[type] = deviceHandlers[type]->getList();
+	if (type.empty()) {
+		for (const auto& [key, value] : deviceHandlers) {
+			root[key] = value->getList();
+		}
 	}
+	else {
+		if (type == "pdo") {
+			root["pdo_source_fixed"] = deviceHandlers["pdo_source_fixed"]->getList();
+			root["pdo_source_variable"] = deviceHandlers["pdo_source_variable"]->getList();
+			root["pdo_source_battery"] = deviceHandlers["pdo_source_battery"]->getList();
+			root["pdo_source_pps"] = deviceHandlers["pdo_source_pps"]->getList();
+			root["pdo_sink_fixed"] = deviceHandlers["pdo_sink_fixed"]->getList();
+			root["pdo_sink_variable"] = deviceHandlers["pdo_sink_variable"]->getList();
+			root["pdo_sink_battery"] = deviceHandlers["pdo_sink_battery"]->getList();
+			root["pdo_sink_pps"] = deviceHandlers["pdo_sink_pps"]->getList();
+		}
+		else if (deviceHandlers.find(type) != deviceHandlers.end()) {
+			root[type] = deviceHandlers[type]->getList();
+		}
+	}
+	return root;
 }
-*/
+
 int main() {
-	Manager* m = new Manager(ROOT_PATH);
+	shared_ptr<Manager> m = make_shared<Manager>(ROOT_PATH);
+	UdevListener::getInstance()->initListener();
 
 	shared_ptr<UdevEvent> event = make_shared<UdevEvent>();
 
@@ -119,13 +139,13 @@ int main() {
 	event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_CHANGE));
 	m->processUdevEvent(event.get());
 	event->mdeviceInfo.clear();
-	
+/*	
 	event->mdeviceInfo.insert(make_pair(DEVPATH,"./sys/class/typec/port0/port0-cable/"));
 	event->mdeviceInfo.insert(make_pair(DEVTYPE,"typec_cable"));
 	event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_REMOVE));
 	m->processUdevEvent(event.get());
 	event->mdeviceInfo.clear();
-
+*/
 	event->mdeviceInfo.insert(make_pair(DEVPATH,"./sys/class/typec/port0/port0-plug0/"));
 	event->mdeviceInfo.insert(make_pair(DEVTYPE,"typec_plug"));
 	event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_ADD));
@@ -198,6 +218,10 @@ int main() {
 	m->processUdevEvent(event.get());
 	event->mdeviceInfo.clear();
 
-	delete m;
+	cout << m->getList().toStyledString() << endl;
+	cout << m->getList("pdo").toStyledString() << endl;
+	//cout << m->getList("typec_cable").toStyledString() << endl;
+	UdevListener::getInstance()->stopListener();
+
 	return 0;
 }

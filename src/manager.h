@@ -19,6 +19,8 @@ private:
 public:
 	Manager(string path);
 	void processUdevEvent(UdevEvent* pUE);
+	Json::Value getList(string type="");
+	Json::Value getListWithPath(string path, string type="");
 
 };
 

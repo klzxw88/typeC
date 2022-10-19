@@ -61,6 +61,7 @@ void SysFS::getSysFS(string file, string path) {
 
 Json::Value SysFS::toJson() {
 	Json::Value root;
+	root["path"] = devpath;
 	for (const auto& [key, value] : mapSysValue) {
 		if (mapSysValue[key]->getHit()) {
 			root[key] = getValue(key);
