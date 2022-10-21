@@ -26,13 +26,12 @@ private:
 	Manager();
 	map<string, shared_ptr<IDeviceHandler>> deviceHandlers;
 	bool get(string path, string type);
-	//void testUdevEvent();
-	void testInterfaces();
 
 public:
 	void processUdevEvent(UdevEvent* pUE);
 	Json::Value getList(string type="");
 	Json::Value getListWithPath(string path, string type="");
+	void getAll();
 	bool getPort(int portIdx);
 	bool getPartner(int portIdx);
 	bool getPartnerIdentity(int portIdx);
@@ -40,8 +39,19 @@ public:
 	bool getCableIdentity(int portIdx);
 	bool getPlug(int portIdx, int plugIdx);
 	bool getPowerDelivery(int portIdx);
+	bool getPowerDeliverySinkFixed(int portIdx);
+	bool getPowerDeliverySinkVariable(int portIdx);
+	bool getPowerDeliverySinkBattery(int portIdx);
+	bool getPowerDeliverySinkPPS(int portIdx);
+	bool getPowerDeliverySink(int portIdx);
+	bool getPowerDeliverySourceFixed(int portIdx);
+	bool getPowerDeliverySourceVariable(int portIdx);
+	bool getPowerDeliverySourceBattery(int portIdx);
+	bool getPowerDeliverySourcePPS(int portIdx);
+	bool getPowerDeliverySource(int portIdx);
 	bool getAltMode(int portIdx, int modeIdx);
 	bool getDP(int portIdx, int modeIdx);
+	bool getWithPath(string p);
 };
 
 #endif

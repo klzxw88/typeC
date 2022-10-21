@@ -76,16 +76,6 @@ void Manager::processUdevEvent(UdevEvent* pUE) {
 	}
 }
 
-bool Manager::getPort(int portIdx) {
-	string devpath = getRealPath(string(ROOT_PATH) + "/port" + to_string(portIdx));
-	if (devpath.empty()) {
-		return false;
-	}
-	devpath += "/";
-	deviceHandlers[DEVTYPE_TYPEC_PORT]->get(devpath);
-	return true;
-}
-
 bool Manager::get(string path, string type) {
 	string devpath = getRealPath(path);
 	if (devpath.empty()) {
@@ -95,6 +85,10 @@ bool Manager::get(string path, string type) {
 	deviceHandlers[type]->get(devpath);
 	return true;
 	
+}
+
+bool Manager::getPort(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx), DEVTYPE_TYPEC_PORT);
 }
 
 bool Manager::getPartner(int portIdx) {
@@ -125,18 +119,148 @@ bool Manager::getDP(int portIdx, int modeIdx) {
 	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/mode" + to_string(modeIdx) + "/displayport", DEVTYPE_DP);
 }
 
-bool Manager::getPowerDelivery(int portIdx) {
-	bool ret = get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery", DEVTYPE_USB_POWER_DELIVERY);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/1:fixed_supply", PDO_SOURCE_FIXED);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/2:variable_supply", PDO_SOURCE_VARIABLE);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/3:battery", PDO_SOURCE_BATTERY);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/4:pps", PDO_SOURCE_PPS);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/1:fixed_supply", PDO_SINK_FIXED);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/2:variable_supply", PDO_SINK_VARIABLE);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/3:battery", PDO_SINK_BATTERY);
-	ret = ret && get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/4:pps", PDO_SINK_PPS);
+bool Manager::getPowerDeliverySinkFixed(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/1:fixed_supply", PDO_SINK_FIXED);
+}
+
+bool Manager::getPowerDeliverySinkVariable(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/2:variable_supply", PDO_SINK_VARIABLE);
+}
+
+bool Manager::getPowerDeliverySinkBattery(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/3:battery", PDO_SINK_BATTERY);
+}
+
+bool Manager::getPowerDeliverySinkPPS(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/4:pps", PDO_SINK_PPS);
+}
+
+bool Manager::getPowerDeliverySink(int portIdx) {
+	bool ret = getPowerDeliverySinkFixed(portIdx);
+	ret = ret && getPowerDeliverySinkVariable(portIdx);
+	ret = ret && getPowerDeliverySinkBattery(portIdx);
+	ret = ret && getPowerDeliverySinkPPS(portIdx);
 	return ret;
 }
+
+bool Manager::getPowerDeliverySourceFixed(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/1:fixed_supply", PDO_SOURCE_FIXED);
+}
+
+bool Manager::getPowerDeliverySourceVariable(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/2:variable_supply", PDO_SOURCE_VARIABLE);
+}
+
+bool Manager::getPowerDeliverySourceBattery(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/3:battery", PDO_SOURCE_BATTERY);
+}
+
+bool Manager::getPowerDeliverySourcePPS(int portIdx) {
+	return get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/4:pps", PDO_SOURCE_PPS);
+}
+
+bool Manager::getPowerDeliverySource(int portIdx) {
+	bool ret = getPowerDeliverySourceFixed(portIdx);
+	ret = ret && getPowerDeliverySourceVariable(portIdx);
+	ret = ret && getPowerDeliverySourceBattery(portIdx);
+	ret = ret && getPowerDeliverySourcePPS(portIdx);
+	return ret;
+}
+
+bool Manager::getPowerDelivery(int portIdx) {
+	bool ret = get(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery", DEVTYPE_USB_POWER_DELIVERY);
+	ret = ret && getPowerDeliverySource(portIdx);
+	ret = ret && getPowerDeliverySink(portIdx);
+	return ret;
+}
+
+bool Manager::getWithPath(string p){
+	if (!fs::exists(p)) {
+		return false;
+	}
+	if (!fs::is_directory(p)) {
+		return false;
+	}
+	if (p[p.length()-1] == '/') {
+		p=p.substr(0,p.length()-1);
+	}
+	fs::path devpath(p);
+	string filename = devpath.filename();
+	if (filename.find("displayport") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_DP);
+	}
+	else if (filename.find("partner") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_TYPEC_PARTNER);
+	}
+	else if (filename.find("cable") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_TYPEC_CABLE);
+	}
+	else if (filename.find("plug") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_TYPEC_PLUG);
+	}
+	else if (filename.find("port") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_TYPEC_PORT);
+	}
+	else if (filename.find("identity") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_IDENTITY);
+	}
+	else if (filename.find("mode") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_TYPEC_ALTMODE);
+	}
+	else if (filename.find("usb_power_delivery") != string::npos) {
+		return Manager::get(devpath.string(), DEVTYPE_USB_POWER_DELIVERY);
+	}
+	else if (devpath.parent_path().filename().string().find("source_capabilities") == string::npos) {
+		if (filename.find("1:fixed_supply") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SOURCE_FIXED);
+		}
+		else if (filename.find("2:variable_supply") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SOURCE_VARIABLE);
+		}
+		else if (filename.find("3:battery") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SOURCE_BATTERY);
+		}
+		else if (filename.find("4:pps") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SOURCE_PPS);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (devpath.parent_path().filename().string().find("sink_capabilities") == string::npos) {
+		if (filename.find("1:fixed_supply") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SINK_FIXED);
+		}
+		else if (filename.find("2:variable_supply") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SINK_VARIABLE);
+		}
+		else if (filename.find("3:battery") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SINK_BATTERY);
+		}
+		else if (filename.find("4:pps") != string::npos) {
+			return Manager::get(devpath.string(), PDO_SINK_PPS);
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+void Manager::getAll() {
+	for (auto const& dir_entry : fs::recursive_directory_iterator(ROOT_PATH, fs::directory_options::follow_directory_symlink)) {
+		if (fs::is_directory(dir_entry)) {
+			if (dir_entry.path().filename() == "source_capabilities")
+				continue;
+			if (dir_entry.path().filename() == "sink_capabilities")
+				continue;
+			getWithPath(dir_entry.path().string());
+		}
+    }
+}
+
 
 Json::Value Manager::getList(string type) {
 	Json::Value root;
@@ -283,7 +407,7 @@ void testUdevEvent() {
 	cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
 	//cout << Manager::instance()->getList(DEVTYPE_TYPEC_CABLE).toStyledString() << endl;
 }
-*/
+
 void testInterfaces() {
 	if (Manager::instance()->getPort(0)) {
 		cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
@@ -314,14 +438,73 @@ void testInterfaces() {
 	}
 }
 
+void testInterfacesPath() {
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/")) {
+		cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/port0-partner/")) {
+		cout << Manager::instance()->getList(DEVTYPE_TYPEC_PARTNER).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/port0-partner/identity/")) {
+		cout << Manager::instance()->getList(DEVTYPE_IDENTITY).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/port0-cable/")) {
+		cout << Manager::instance()->getList(DEVTYPE_TYPEC_CABLE).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/port0-cable/identity/")) {
+		cout << Manager::instance()->getList(DEVTYPE_IDENTITY).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/port0-plug0/")) {
+		cout << Manager::instance()->getList(DEVTYPE_TYPEC_PLUG).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/bus/typec/devices/port0/mode1/")) {
+		cout << Manager::instance()->getList(DEVTYPE_TYPEC_ALTMODE).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/bus/typec/devices/port0/mode1/displayport/")) {
+		cout << Manager::instance()->getList(DEVTYPE_DP).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/")) {
+		cout << Manager::instance()->getList(DEVTYPE_USB_POWER_DELIVERY).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/source_capabilities/1:fixed_supply/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/source_capabilities/2:variable_supply/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/source_capabilities/3:battery/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/source_capabilities/4:pps/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/sink_capabilities/1:fixed_supply/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/sink_capabilities/2:variable_supply/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/sink_capabilities/3:battery/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+	if (Manager::instance()->getWithPath("./sys/class/typec/port0/usb_power_delivery/sink_capabilities/4:pps/")) {
+		cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+	}
+}
+*/
 int main() {
 	UdevListener::instance()->initListener();
 
 	//testUdevEvent();
-	testInterfaces();
+	//testInterfaces();
+	//testInterfacesPath();
+	Manager::instance()->getAll();
+	cout << Manager::instance()->getList().toStyledString() << endl;
+
+	// null -> empty array
+	// fix power delivery capability json
 
 	UdevListener::instance()->stopListener();
 
 	return 0;
 }
-
