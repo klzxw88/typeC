@@ -31,7 +31,7 @@ AlternateMode::AlternateMode(string path)
 }
 /*
 int main() {
-	AlternateMode* p = new AlternateMode("./sys/bus/typec/devices/1-1/mode1/");
+	AlternateMode* p = new AlternateMode("./sys/bus/typec/devices/port0/mode1/");
 	cout << p->getValue("active") << endl;
 	cout << p->getValue("description") << endl;
 	cout << p->getValue("mode") << endl;

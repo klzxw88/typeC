@@ -12,12 +12,12 @@
 #include <thread>
 #include <iostream>
 
-#define memzero(x,l) (std::memset((x), 0, (l)))
+#define memzero(x,l) (memset((x), 0, (l)))
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 using namespace DevAttributes;
 
-std::atomic<bool> UdevListener::m_listenerRunning = false;
+atomic<bool> UdevListener::m_listenerRunning = false;
 
 UdevListener::UdevListener(): m_udev(nullptr) {
 }
@@ -26,13 +26,8 @@ UdevListener::~UdevListener() {
 	stopListener();
 }
 
-UdevListener *UdevListener::getInstance() {
-    static UdevListener _instance;
-    return &_instance;
-}
-
 bool UdevListener::initListener() {
-	std::cout << "UdevListener::" << __FUNCTION__ << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << endl;
     bool initDone = false;
     if (init()) {
         if (startListener()) {
@@ -44,14 +39,14 @@ bool UdevListener::initListener() {
 }
 
 bool UdevListener::startListener() {
-	std::cout << "UdevListener::" << __FUNCTION__ << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << endl;
 	m_listenerRunning = true;
-    m_listenerThread = std::thread(&UdevListener::threadStart,this);
+    m_listenerThread = thread(&UdevListener::threadStart,this);
     return true;
 }
 
 bool UdevListener::stopListener() {
-	std::cout << "UdevListener::" << __FUNCTION__ << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << endl;
 	if (!m_listenerRunning) {
 		return false;
 	}
@@ -62,8 +57,8 @@ bool UdevListener::stopListener() {
 			m_listenerRunning = false;
     		m_listenerThread.join();
        	}
-       	catch (std::exception &e) {
-			std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " caught system_error: " << e.what() << std::endl;
+       	catch (exception &e) {
+			cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " caught system_error: " << e.what() << endl;
        	}
 	}
     return true;
@@ -72,19 +67,19 @@ bool UdevListener::stopListener() {
 /*  To get the new udev instances
 */
 bool UdevListener::init() {
-	std::cout << "UdevListener::" << __FUNCTION__ << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << endl;
     m_udev = udev_new();
     if (!m_udev) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " udev_new() failed" << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " udev_new() failed" << endl;
         return false;
     }
     return true;
 }
 
 void UdevListener::enumerate_devices() {
-	std::cout << "UdevListener::" << __FUNCTION__ << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << endl;
     if (m_udev == nullptr) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " m_udev is null" << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " m_udev is null" << endl;
         return;
     }
     enumerate_subsystem_devices("usb");
@@ -100,29 +95,29 @@ void UdevListener::threadStart() {
 
     fd_ep = epoll_create1(EPOLL_CLOEXEC);
     if (fd_ep < 0) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " error creating epoll fd: " << strerror(errno) << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " error creating epoll fd: " << strerror(errno) << endl;
         goto out;
     }
     monitor = udev_monitor_new_from_netlink(m_udev, "udev");
     if (monitor == NULL) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " no socket" << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " no socket" << endl;
         goto out;
     }
 
-    if (udev_monitor_filter_add_match_subsystem_devtype(monitor, "usb", "usb_device") < 0 ||
-            udev_monitor_filter_add_match_subsystem_devtype(monitor, "typec", NULL) < 0) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " filter failed" << std::endl;
+    //if (udev_monitor_filter_add_match_subsystem_devtype(monitor, "usb", "usb_device") < 0 ||
+    if (udev_monitor_filter_add_match_subsystem_devtype(monitor, "typec", NULL) < 0) {
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " filter failed" << endl;
         goto out;
     }
 
 	//if (udev_monitor_set_receive_buffer_size(monitor, 128*1024*1024) < 0) {
 	if (udev_monitor_set_receive_buffer_size(monitor, 128*1024) < 0) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " failed to set buffer size" << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " failed to set buffer size" << endl;
         goto out;
     }
 
     if (udev_monitor_enable_receiving(monitor) < 0) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " bind failed" << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " bind failed" << endl;
         goto out;
     }
     fd_udev = udev_monitor_get_fd(monitor);
@@ -130,7 +125,7 @@ void UdevListener::threadStart() {
     ep_udev.events = EPOLLIN;
     ep_udev.data.fd = fd_udev;
     if (epoll_ctl(fd_ep, EPOLL_CTL_ADD, fd_udev, &ep_udev) < 0) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " fail to add fd to epoll: " << strerror(errno) << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " fail to add fd to epoll: " << strerror(errno) << endl;
         goto out;
     }
 
@@ -148,16 +143,16 @@ void UdevListener::threadStart() {
             if (ev[i].data.fd == fd_udev && ev[i].events & EPOLLIN) {
                 device = udev_monitor_receive_device(monitor);
                 if (device == NULL) {
-					std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << "no device from socket" << std::endl;
+					cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << "no device from socket" << endl;
                     continue;
                 }
-                UdevEvent *pNE = new (std::nothrow) UdevEvent;
+                UdevEvent *pNE = new (nothrow) UdevEvent;
                 if (pNE) {
                     pNE->parser(device, true);
                     //onEvent(pNE);
                 }
                 else {
-					std::cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " memory failure for PdmNetlinkEvent" << std::endl;
+					cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " memory failure for PdmNetlinkEvent" << endl;
                 }
 				delete pNE;
                 udev_device_unref(device);
@@ -172,12 +167,12 @@ void UdevListener::threadStart() {
     udev_monitor_unref(monitor);
 }
 
-bool UdevListener::checkExternalUsbDevice(std::string &path) {
+bool UdevListener::checkExternalUsbDevice(string &path) {
 
-	std::cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Device PATH = [" << path.c_str() << "]" << std::endl;
-    std::size_t found = path.find("usb");
-    if (found == std::string::npos) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Device PATH = [" << path << "] not found" << std::endl;
+	cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Device PATH = [" << path.c_str() << "]" << endl;
+    size_t found = path.find("usb");
+    if (found == string::npos) {
+		cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Device PATH = [" << path << "] not found" << endl;
         return false;
     }
 
@@ -187,17 +182,17 @@ bool UdevListener::checkExternalUsbDevice(std::string &path) {
         }
     }
     m_usbDevicePath.push_back(path);
-	std::cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Device PATH = [" << path << "] pushed inside list" << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Device PATH = [" << path << "] pushed inside list" << endl;
     return true;
 }
 
-void UdevListener::enumerate_subsystem_devices(std::string subSys) {
+void UdevListener::enumerate_subsystem_devices(string subSys) {
     if (m_udev == nullptr) {
-		std::cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " m_udev is null" << std::endl;
+		cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " m_udev is null" << endl;
         return;
     }
     struct udev_enumerate* enumerate = udev_enumerate_new(m_udev);
-	std::cout << "UdevListener::" << __FUNCTION__ << std::endl;
+	//cout << "UdevListener::" << __FUNCTION__ << endl;
     udev_enumerate_add_match_subsystem(enumerate, subSys.c_str());
 
     udev_enumerate_scan_devices(enumerate);
@@ -208,11 +203,11 @@ void UdevListener::enumerate_subsystem_devices(std::string subSys) {
     udev_list_entry_foreach(entry, devices) {
         const char* path = udev_list_entry_get_name(entry);
         struct udev_device* device = udev_device_new_from_syspath(m_udev, path);
-        std::string pathfinder = path;
+        string pathfinder = path;
         struct udev_device* parent_dev = udev_device_get_parent(device);
 
         if (parent_dev) {
-			std::cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Parent device " << path << std::endl;
+			//cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Parent device " << path << endl;
             UdevEvent *pNE = new UdevEvent;
             pNE->parser(device, false);
 			delete pNE;

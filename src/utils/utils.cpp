@@ -1,5 +1,9 @@
 #include "utils.h"
 
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 template bool writeToFile(string fileToWrite, string &usbData);
 template bool writeToFile(string fileToWrite, int &usbData);
 
@@ -21,8 +25,7 @@ bool readFromFile(string fileToRead, string &usbData) {
 }
 
 template<typename T>
-bool writeToFile(string fileToWrite, T &usbData)
-{
+bool writeToFile(string fileToWrite, T &usbData) {
     ofstream countFile (fileToWrite, ofstream::out);
     if(countFile.is_open()){
         countFile << usbData;
@@ -31,4 +34,25 @@ bool writeToFile(string fileToWrite, T &usbData)
     } else {
         return false;
     }
+}
+	
+string getRealPath(string path) {
+	fs::path p(path);
+    if (!fs::exists(p)) {
+		std::cout << "no exist" << std::endl;
+		return "";
+    }
+	fs::path devpath;
+	if (fs::is_symlink(p)) {
+		try {
+			devpath = fs::canonical(p.parent_path()/fs::read_symlink(p));
+		} catch (std::exception &e) {
+			cout << "exception: "<< e.what() << endl;
+			return "";
+		}
+	}
+	else {
+		devpath = p;
+	}
+	return devpath;
 }

@@ -5,23 +5,43 @@
 #include <map>
 #include <algorithm>
 
+#include "singleton.h"
 #include "device_handler.h"
 
 #define ROOT_PATH "./sys/class/typec"
 
 using namespace std;
 
-class Manager {
+class Manager : public Singleton<Manager> {
 private:
-	string devpath;
+	friend class Singleton<Manager>;
+	const string PDO_SOURCE_FIXED = "pdo_source_fixed";
+	const string PDO_SOURCE_VARIABLE = "pdo_source_variable";
+	const string PDO_SOURCE_BATTERY = "pdo_source_battery";
+	const string PDO_SOURCE_PPS = "pdo_source_pps";
+	const string PDO_SINK_FIXED = "pdo_sink_fixed";
+	const string PDO_SINK_VARIABLE = "pdo_sink_variable";
+	const string PDO_SINK_BATTERY = "pdo_sink_battery";
+	const string PDO_SINK_PPS = "pdo_sink_pps";
+	Manager();
 	map<string, shared_ptr<IDeviceHandler>> deviceHandlers;
+	bool get(string path, string type);
+	//void testUdevEvent();
+	void testInterfaces();
 
 public:
-	Manager(string path);
 	void processUdevEvent(UdevEvent* pUE);
 	Json::Value getList(string type="");
 	Json::Value getListWithPath(string path, string type="");
-
+	bool getPort(int portIdx);
+	bool getPartner(int portIdx);
+	bool getPartnerIdentity(int portIdx);
+	bool getCable(int portIdx);
+	bool getCableIdentity(int portIdx);
+	bool getPlug(int portIdx, int plugIdx);
+	bool getPowerDelivery(int portIdx);
+	bool getAltMode(int portIdx, int modeIdx);
+	bool getDP(int portIdx, int modeIdx);
 };
 
 #endif

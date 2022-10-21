@@ -12,5 +12,6 @@ using namespace std;
 bool readFromFile(string fileToRead, string &usbData);
 template<typename T> bool writeToFile(std::string fileToWrite, T &usbData);
 string &rtrim(string &s);
+string getRealPath(string path);
 
 #endif

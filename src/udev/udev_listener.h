@@ -3,25 +3,30 @@
 
 #include "atrributes.h"
 
-#include <thread>
-#include <list>
 #include <atomic>
+#include <list>
+#include <memory>
+#include <thread>
+
+#include "singleton.h"
+
+using namespace std;
 
 class PdmNetlinkEvent;
 
-class UdevListener {
+class UdevListener : public Singleton<UdevListener> {
 private:
-    static std::atomic<bool> m_listenerRunning;
+	friend class Singleton<UdevListener>;
+    static atomic<bool> m_listenerRunning;
     struct udev* m_udev;
-    std::thread m_listenerThread;
-    std::list<std::string> m_usbDevicePath;
+    thread m_listenerThread;
+    list<string> m_usbDevicePath;
 
     UdevListener();
   	UdevListener(const UdevListener& src) = delete;
   	UdevListener& operator=(const UdevListener& rhs) = delete;
 
 public:
-    static UdevListener *getInstance();
     ~UdevListener();
 
     bool initListener();
@@ -33,8 +38,8 @@ private:
     bool init();
     void threadStart();
     void enumerate_devices();
-    void enumerate_subsystem_devices(std::string subSys);
-    bool checkExternalUsbDevice(std::string &path);
+    void enumerate_subsystem_devices(string subSys);
+    bool checkExternalUsbDevice(string &path);
 };
 
 #endif //_UdevListener_H

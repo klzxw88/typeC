@@ -16,6 +16,7 @@ protected:
 public:
 	IDeviceHandler(string n):name(n) {};
 	virtual ~IDeviceHandler() {};
+	virtual void get(string path) = 0;
 	virtual bool processUdevEvent(UdevEvent* pUE) = 0;
 	virtual Json::Value getList() = 0;
 };
@@ -31,6 +32,7 @@ public:
 		devices.clear();
 	};
 	bool processUdevEvent(UdevEvent* pUE) override;
+	void get(string path) override;
 	Json::Value getList() override;
 };
 
@@ -65,6 +67,18 @@ bool DeviceHandler<T>::processUdevEvent(UdevEvent* pUE) {
 		}
 	}
 	return false;
+}
+
+template <typename T>
+void DeviceHandler<T>::get(string devpath) {
+	std::lock_guard<std::recursive_mutex> lock(mtx);
+	auto device = find_if(devices.begin(), devices.end(), [&devpath](auto d) { return (d->getDevPath() == devpath); });
+	if (devices.end() == device) {
+		devices.push_back(make_shared<T>(devpath));
+	}
+	else {
+		(*device)->getSysFSAll();
+	}
 }
 
 template <typename T>
