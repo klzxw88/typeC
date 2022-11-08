@@ -35,24 +35,24 @@ bool writeToFile(string fileToWrite, T &usbData) {
         return false;
     }
 }
-	
+    
 string getRealPath(string path) {
-	fs::path p(path);
+    fs::path p(path);
     if (!fs::exists(p)) {
-		std::cout << "no exist" << std::endl;
-		return "";
+        std::cout << "no exist" << std::endl;
+        return "";
     }
-	fs::path devpath;
-	if (fs::is_symlink(p)) {
-		try {
-			devpath = fs::canonical(p.parent_path()/fs::read_symlink(p));
-		} catch (std::exception &e) {
-			cout << "exception: "<< e.what() << endl;
-			return "";
-		}
-	}
-	else {
-		devpath = p;
-	}
-	return devpath;
+    fs::path devpath;
+    try {
+        if (fs::is_symlink(p)) {
+            devpath = fs::canonical(p.parent_path()/fs::read_symlink(p));
+        }
+        else {
+            devpath = fs::canonical(p);
+        }
+    } catch (std::exception &e) {
+        cout << "exception: "<< e.what() << endl;
+        return "";
+    }
+    return devpath;
 }

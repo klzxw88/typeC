@@ -6,9 +6,9 @@
 
 class SinkFixedSupply : public SysFS {
 private:
-	const string name = "pdo";
+    const string name = "pdo";
 public:
-	SinkFixedSupply(string path);
+    SinkFixedSupply(string path);
 };
 
 #endif

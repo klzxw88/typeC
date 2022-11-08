@@ -6,26 +6,26 @@
 #include "sysfs.h"
 
 enum CABLE_TYPES {
-	CABLE_TYPE_NOT_CABLE = 120,
-	CABLE_TYPE_PASSIVE = 121,
-	CABLE_TYPE_ACTIVE = 122,
-	CABLE_TYPE_VPD = 123,
+    CABLE_TYPE_NOT_CABLE = 120,
+    CABLE_TYPE_PASSIVE = 121,
+    CABLE_TYPE_ACTIVE = 122,
+    CABLE_TYPE_VPD = 123,
 };
 
 enum PLUG_TYPES {
-	PLUG_TYPE_UNKNOWN = 130,
-	PLUG_TYPE_A = 131,
-	PLUG_TYPE_B = 132,
-	PLUG_TYPE_C = 133,
-	PLUG_TYPE_CAPTIVE = 134,
+    PLUG_TYPE_UNKNOWN = 130,
+    PLUG_TYPE_A = 131,
+    PLUG_TYPE_B = 132,
+    PLUG_TYPE_C = 133,
+    PLUG_TYPE_CAPTIVE = 134,
 };
 
 class Cable : public SysFS {
 private:
-	const string name = "typec_cable";
+    const string name = "typec_cable";
 
 public:
-	Cable(string path);
+    Cable(string path);
 };
 
 #endif

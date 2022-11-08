@@ -6,9 +6,9 @@
 
 class Plug : public SysFS {
 private:
-	const string name = "typec_plug";
+    const string name = "typec_plug";
 public:
-	Plug(string path);
+    Plug(string path);
 };
 
 #endif

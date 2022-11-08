@@ -31,18 +31,18 @@ void UdevEvent::getDeviceInfo(struct udev_device* device, bool isInitDone) {
             }
         }
         if (name.compare("DEVPATH") == 0) {
-			string sys = "/sys";
-			if (value.compare(0,sys.length(),sys) != 0) {
-				value=sys+value;
-			}
-			if (value[value.length()-1] != '/') {
-				value+='/';
-			}
-		}
+            string sys = "/sys";
+            if (value.compare(0,sys.length(),sys) != 0) {
+                value=sys+value;
+            }
+            if (value[value.length()-1] != '/') {
+                value+='/';
+            }
+        }
         mdeviceInfo[name] = value;
-		cout << "UdevEvent::getDeviceInfo - Name: " << name.c_str() << " Value: " << value.c_str() << endl;
+        cout << "UdevEvent::getDeviceInfo - Name: " << name.c_str() << " Value: " << value.c_str() << endl;
     }
-	cout << endl;
+    cout << endl;
     if (!isInitDone) {
         mdeviceInfo[ACTION] = DEVICE_ADD;
     }

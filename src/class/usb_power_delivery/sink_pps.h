@@ -8,9 +8,9 @@
 
 class SinkPPS : public SysFS {
 private:
-	const string name = "pdo";
+    const string name = "pdo";
 public:
-	SinkPPS(string path);
+    SinkPPS(string path);
 };
 
 #endif

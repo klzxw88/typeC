@@ -72,15 +72,15 @@ namespace DevAttributes {
     const string UHCI = "uhci";
 
 // DEVTYPE
-	const string DEVTYPE_TYPEC_PORT = "typec_port";
-	const string DEVTYPE_TYPEC_PARTNER = "typec_partner";
-	const string DEVTYPE_TYPEC_CABLE = "typec_cable";
-	const string DEVTYPE_TYPEC_PLUG = "typec_plug";
-	const string DEVTYPE_IDENTITY = "identity";
-	const string DEVTYPE_USB_POWER_DELIVERY = "usb_power_delivery";
-	const string DEVTYPE_PDO = "pdo";
-	const string DEVTYPE_TYPEC_ALTMODE = "typec_alternate_mode";
-	const string DEVTYPE_DP = "displayport";
+    const string DEVTYPE_TYPEC_PORT = "typec_port";
+    const string DEVTYPE_TYPEC_PARTNER = "typec_partner";
+    const string DEVTYPE_TYPEC_CABLE = "typec_cable";
+    const string DEVTYPE_TYPEC_PLUG = "typec_plug";
+    const string DEVTYPE_IDENTITY = "identity";
+    const string DEVTYPE_USB_POWER_DELIVERY = "usb_power_delivery";
+    const string DEVTYPE_PDO = "pdo";
+    const string DEVTYPE_TYPEC_ALTMODE = "typec_alternate_mode";
+    const string DEVTYPE_DP = "displayport";
 };
 
 #endif /* DEVATTRIBUTES_H_ */

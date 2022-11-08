@@ -9,7 +9,6 @@
 
 class UdevEvent {
 private:
-
     void getDeviceInfo(struct udev_device* dev, bool isInitDone);
 
 public:

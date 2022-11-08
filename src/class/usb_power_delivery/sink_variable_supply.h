@@ -6,9 +6,9 @@
 
 class SinkVariableSupply : public SysFS {
 private:
-	const string name = "pdo";
+    const string name = "pdo";
 public:
-	SinkVariableSupply(string path);
+    SinkVariableSupply(string path);
 };
 
 #endif

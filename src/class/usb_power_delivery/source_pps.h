@@ -8,9 +8,9 @@
 
 class SourcePPS : public SysFS {
 private:
-	const string name = "pdo";
+    const string name = "pdo";
 public:
-	SourcePPS(string path);
+    SourcePPS(string path);
 };
 
 #endif

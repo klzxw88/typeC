@@ -6,9 +6,9 @@
 
 class SinkBattery : public SysFS {
 private:
-	const string name = "pdo";
+    const string name = "pdo";
 public:
-	SinkBattery(string path);
+    SinkBattery(string path);
 };
 
 #endif

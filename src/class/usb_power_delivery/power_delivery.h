@@ -6,9 +6,9 @@
 
 class PowerDelivery : public SysFS {
 private:
-	const string name = "usb_power_delivery";
+    const string name = "usb_power_delivery";
 public:
-	PowerDelivery(string path);
+    PowerDelivery(string path);
 };
 
 #endif

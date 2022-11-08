@@ -12,139 +12,164 @@ using namespace placeholders;
 
 class ISysFSValue {
 private:
-	string name;
-	bool isWritable;
+    string name;
+    bool isWritable;
 protected:
-	bool isHit;
+    bool isHit;
 public:
-	ISysFSValue(string n, bool b) : name(n), isWritable(b), isHit(false) {};
-	virtual ~ISysFSValue() {};
+    ISysFSValue(string n, bool b) : name(n), isWritable(b), isHit(false) {};
+    virtual ~ISysFSValue() {};
 
-	virtual bool empty() = 0;
-	virtual string getString() = 0;
-	virtual string getString(int i) = 0;
-	virtual void setString(string s) = 0;
-	void setHit() { isHit = true; };
-	bool getHit() { return isHit; };
-	bool writable() { return isWritable; };
-	string getName() { return name; };
+    virtual bool empty() = 0;
+    virtual bool load(string s) = 0;
+    virtual string to_string() = 0;
+    virtual string to_string(int i) = 0;
+    void setHit() { isHit = true; };
+    bool getHit() { return isHit; };
+    bool writable() { return isWritable; };
+    string getName() { return name; };
 };
 
 template <typename T>
 class SysFSValue : public ISysFSValue {
 private:
-	map<string, T> table;
-	T value;
+    map<string, T> table;
+    T value;
+    string devpath;
 public:
-	SysFSValue(string n, bool b) : ISysFSValue(n, b) {};
-	~SysFSValue() {};
+    using value_type = T;
+    SysFSValue(string path, string n, bool b) : ISysFSValue(n, b), devpath(path) {};
+    ~SysFSValue() {};
 
-	T get() { return value; };
-	void set(T val) { value = val; };
-	void setString(string s) override;
-	void add(string s, T t) { table.insert(make_pair(s,t)); };
-	bool empty() override { return table.empty(); };
-	string getString() override;
-	string getString(int i) override;
+    T get() { return value; };
+    void set(T val) { value = val; };
+    void add(string s, T t) { table.insert(make_pair(s,t)); };
+    bool load(string s) override;
+    bool empty() override { return table.empty(); };
+    string to_string() override;
+    string to_string(int i) override;
 };
 
 template<typename T>
-void SysFSValue<T>::setString(string s) {
-	if constexpr (is_same_v<T, string>) {
-		value = s;
-	}
-	else if (is_same_v<T, bitset<32>>) {
-		if (s[0] == '0' && s[1] == 'x') {
-			s = s.substr(2, s.length()-2);
-			stringstream ss;
-			unsigned int iVal;
-			ss << std::hex << s;
-			ss >> iVal;
-			value = iVal;
-		}
-		else if(std::all_of(s.begin(), s.end()-2, ::isxdigit)) {
-			stringstream ss;
-			unsigned int iVal;
-			ss << std::hex << s;
-			ss >> iVal;
-			value = iVal;
-		}
-	}
-	else if (is_same_v<T, bool>) {
-		if (s == "yes\n" || s == "1\n" || s == "true\n") {
-			value = true;
-		}
-		else {
-			value = false;
-		}
-	}
-	else if (table.empty()) {
-		if(std::all_of(s.begin(), s.end()-2, ::isxdigit)) {
-			stringstream ss;
-			unsigned int iVal;
-			ss << std::hex << s;
-			ss >> iVal;
-			value = iVal;
-		}
-		else {
-			value = stoi(s);
-		}
-	}
-	else {
-		value = table[s];
-	}
+bool SysFSValue<T>::load(string s) {
+    if constexpr (is_same_v<T, string>) {
+        value = s;
+        return true;
+    }
+    else if constexpr (is_same_v<T, bitset<32>>) {
+        if (s[0] == '0' && s[1] == 'x') {
+            s = s.substr(2, s.length()-2);
+            stringstream ss;
+            unsigned int iVal;
+            ss << std::hex << s;
+            ss >> iVal;
+            value = iVal;
+            return true;
+        }
+        else if (std::all_of(s.begin(), s.end()-2, ::isxdigit)) {
+            stringstream ss;
+            unsigned int iVal;
+            ss << std::hex << s;
+            ss >> iVal;
+            value = iVal;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if constexpr (is_same_v<T, bool>) {
+        if (s == "yes\n" || s == "1\n" || s == "true\n") {
+            value = true;
+        }
+        else {
+            value = false;
+        }
+        return true;
+    }
+    else if (table.empty()) {
+        if(std::all_of(s.begin(), s.end()-2, ::isxdigit)) {
+            stringstream ss;
+            unsigned int iVal;
+            ss << std::hex << s;
+            ss >> iVal;
+            value = iVal;
+            return true;
+        }
+        else {
+            try {
+                value = stoi(s);
+                return true;
+            } catch(std::invalid_argument const& ex) {
+                std::cout << "std::invalid_argument::what(): " << ex.what() << '\n';
+                return false;
+            } catch(std::out_of_range const& ex) {
+                 std::cout << "std::out_of_range::what(): " << ex.what() << '\n';
+                return false;
+            }
+        }
+    }
+    else {
+        if (table.find(s) != table.end()) {
+            value = table[s];
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
 
 template<typename T>
-string SysFSValue<T>::getString() {
-	if constexpr (is_same_v<T, string>) {
-		return value;
-	}
-	else if constexpr (is_same_v<T, bitset<32>>) {
-		return value.to_string();
-	}
-	else if constexpr (is_same_v<T, bool>) {
-		return value?"yes":"no";
-	}
-	else if (table.empty()) {
-		return to_string(value);	
-	}
-	else {
-		auto result = find_if(
-				table.begin(),
-				table.end(),
-				[&](const auto& mo) {return mo.second == value; });
-		if (result != table.end()) {
-			return result->first;	
-		}
-		return "";
-	}
+string SysFSValue<T>::to_string() {
+    if constexpr (is_same_v<T, string>) {
+        return value;
+    }
+    else if constexpr (is_same_v<T, bitset<32>>) {
+        return value.to_string();
+    }
+    else if constexpr (is_same_v<T, bool>) {
+        return value?"yes":"no";
+    }
+    else if (table.empty()) {
+        return to_string(value);
+    }
+    else {
+        auto result = find_if(
+                table.begin(),
+                table.end(),
+                [&](const auto& mo) {return mo.second == value; });
+        if (result != table.end()) {
+            return result->first;
+        }
+        return "";
+    }
 }
 
 template<typename T>
-string SysFSValue<T>::getString(int i) {
-	if constexpr (is_same_v<T, string>) {
-		return "";
-	}
-	else if constexpr (is_same_v<T, bitset<32>>) {
-		return "";
-	}
-	else if constexpr (is_same_v<T, bool>) {
-		return "";
-	}
-	else if (table.empty()) {
-		return "";
-	}
-	else {
-		auto result = find_if(
-				table.begin(),
-				table.end(),
-				[&](const auto& mo) {return mo.second == i; });
-		if (result != table.end()) {
-			return result->first;	
-		}
-		return "";
-	}
+string SysFSValue<T>::to_string(int i) {
+    if constexpr (is_same_v<T, string>) {
+        return "";
+    }
+    else if constexpr (is_same_v<T, bitset<32>>) {
+        return "";
+    }
+    else if constexpr (is_same_v<T, bool>) {
+        return "";
+    }
+    else if (table.empty()) {
+        return "";
+    }
+    else {
+        auto result = find_if(
+                table.begin(),
+                table.end(),
+                [&](const auto& mo) {return mo.second == i; });
+        if (result != table.end()) {
+            return result->first;
+        }
+        return "";
+    }
 }
 
 #endif

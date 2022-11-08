@@ -6,9 +6,9 @@
 
 class SourceFixedSupply : public SysFS {
 private:
-	const string name = "pdo";
+    const string name = "pdo";
 public:
-	SourceFixedSupply(string path);
+    SourceFixedSupply(string path);
 };
 
 #endif

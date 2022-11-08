@@ -16,15 +16,15 @@ class PdmNetlinkEvent;
 
 class UdevListener : public Singleton<UdevListener> {
 private:
-	friend class Singleton<UdevListener>;
+    friend class Singleton<UdevListener>;
     static atomic<bool> m_listenerRunning;
     struct udev* m_udev;
     thread m_listenerThread;
     list<string> m_usbDevicePath;
 
     UdevListener();
-  	UdevListener(const UdevListener& src) = delete;
-  	UdevListener& operator=(const UdevListener& rhs) = delete;
+    UdevListener(const UdevListener& src) = delete;
+    UdevListener& operator=(const UdevListener& rhs) = delete;
 
 public:
     ~UdevListener();

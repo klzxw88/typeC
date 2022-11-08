@@ -7,9 +7,9 @@
 
 class AlternateMode : public SysFS {
 private:
-	const string name = "typec_alternate_mode";
+    const string name = "typec_alternate_mode";
 public:
-	AlternateMode(string path);
+    AlternateMode(string path);
 };
 
 #endif
