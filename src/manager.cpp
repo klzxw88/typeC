@@ -209,7 +209,7 @@ bool Manager::getWithPath(string p){
     else if (filename.find("usb_power_delivery") != string::npos) {
         return Manager::get(devpath.string(), DEVTYPE_USB_POWER_DELIVERY);
     }
-    else if (devpath.parent_path().filename().string().find("source_capabilities") == string::npos) {
+    else if (devpath.parent_path().filename().string().find("source_capabilities") != string::npos) {
         if (filename.find("1:fixed_supply") != string::npos) {
             return Manager::get(devpath.string(), PDO_SOURCE_FIXED);
         }
@@ -226,7 +226,7 @@ bool Manager::getWithPath(string p){
             return false;
         }
     }
-    else if (devpath.parent_path().filename().string().find("sink_capabilities") == string::npos) {
+    else if (devpath.parent_path().filename().string().find("sink_capabilities") != string::npos) {
         if (filename.find("1:fixed_supply") != string::npos) {
             return Manager::get(devpath.string(), PDO_SINK_FIXED);
         }
@@ -367,6 +367,70 @@ bool Manager::set(string path, string type, string attr, string value) {
     devpath += "/";
     deviceHandlers[type]->set(devpath, attr, value);
     return true;
+}
+
+bool Manager::setPort(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx), DEVTYPE_TYPEC_PORT, attr, value);
+}
+
+bool Manager::setPartner(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/port" + to_string(portIdx) + "-partner", DEVTYPE_TYPEC_PARTNER, attr, value);
+}
+
+bool Manager::setPartnerIdentity(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/port" + to_string(portIdx) + "-partner/identity", DEVTYPE_IDENTITY, attr, value);
+}
+
+bool Manager::setCable(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/port" + to_string(portIdx) + "-cable", DEVTYPE_TYPEC_CABLE, attr, value);
+}
+
+bool Manager::setCableIdentity(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/port" + to_string(portIdx) + "-cable/identity", DEVTYPE_IDENTITY, attr, value);
+}
+
+bool Manager::setPlug(int portIdx, int plugIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/port" + to_string(portIdx) + "-plug" + to_string(plugIdx), DEVTYPE_TYPEC_PLUG, attr, value);
+}
+
+bool Manager::setAltMode(int portIdx, int modeIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/mode" + to_string(modeIdx), DEVTYPE_TYPEC_ALTMODE, attr, value);
+}
+
+bool Manager::setDP(int portIdx, int modeIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/mode" + to_string(modeIdx) + "/displayport", DEVTYPE_DP, attr, value);
+}
+
+bool Manager::setPowerDeliverySinkFixed(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/1:fixed_supply", PDO_SINK_FIXED, attr, value);
+}
+
+bool Manager::setPowerDeliverySinkVariable(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/2:variable_supply", PDO_SINK_VARIABLE, attr, value);
+}
+
+bool Manager::setPowerDeliverySinkBattery(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/3:battery", PDO_SINK_BATTERY, attr, value);
+}
+
+bool Manager::setPowerDeliverySinkPPS(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/sink_capabilities/4:pps", PDO_SINK_PPS, attr, value);
+}
+
+bool Manager::setPowerDeliverySourceFixed(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/1:fixed_supply", PDO_SOURCE_FIXED, attr, value);
+}
+
+bool Manager::setPowerDeliverySourceVariable(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/2:variable_supply", PDO_SOURCE_VARIABLE, attr, value);
+}
+
+bool Manager::setPowerDeliverySourceBattery(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/3:battery", PDO_SOURCE_BATTERY, attr, value);
+}
+
+bool Manager::setPowerDeliverySourcePPS(int portIdx, string attr, string value) {
+    return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/4:pps", PDO_SOURCE_PPS, attr, value);
 }
 
 /*
@@ -583,6 +647,7 @@ int main() {
     //testInterfacesPath();
     Manager::instance()->getAll();
     cout << Manager::instance()->getList().toStyledString() << endl;
+    /*
     Manager::instance()->setWithPath("./sys/bus/typec/devices/port0/mode1/displayport/", "configuration", "[USB] source sink\n");
     Manager::instance()->setWithPath("./sys/bus/typec/devices/port0/mode1/displayport/", "pin_assignment", "A [B] C\n");
     //Manager::instance()->setWithPath("./sys/bus/typec/devices/port0/mode1/displayport/", "abc", "A [B] C\n");
@@ -603,6 +668,40 @@ int main() {
     Manager::instance()->setWithPath("./sys/class/typec/port0/", "port_type", "dual [source] sink\n");
     Manager::instance()->setWithPath("./sys/class/typec/port0/", "vconn_source", "yes\n");
     Manager::instance()->setWithPath("./sys/class/typec/port0/", "preferred_role", "source\n");
+    Manager::instance()->getAll();
+    cout << Manager::instance()->getList().toStyledString() << endl;
+    */
+    Manager::instance()->setPort(0, "data_role", "[host]\n");
+    Manager::instance()->setPort(0, "power_role", "[source]\n");
+    Manager::instance()->setPort(0, "port_type", "[source]\n");
+    Manager::instance()->setPort(0, "vconn_source", "no\n");
+    Manager::instance()->setPort(0, "preferred_role", "sink\n");
+    //Manager::instance()->setPartner(0, "accessory_mode", "none\n");
+    //Manager::instance()->setPartnerIdentity(0, "product_type_vdo1", "0x00000000\n");
+    //Manager::instance()->setCable(0, "plug_type", "unkown\n");
+    //Manager::instance()->setCableIdentity(0, "product_type_vdo1", "0x00000000\n");
+    //Manager::instance()->setPlug(0, 0, "number_of_alternate_modes", "1");
+    Manager::instance()->setAltMode(0, 1, "active", "yes\n");
+    Manager::instance()->setDP(0, 1, "configuration", "[USB] source sink\n");
+    Manager::instance()->setDP(0, 1, "pin_assignment", "A [B] C\n");
+    //Manager::instance()->setPowerDeliverySinkFixed(0, "dual_role_power", "yes\n");
+    //Manager::instance()->setPowerDeliverySinkVariable(0, "operational_current", "4000mA\n");
+    //Manager::instance()->setPowerDeliverySinkBattery(0, "operational_power", "200000mW\n");
+    //Manager::instance()->setPowerDeliverySinkPPS(0, "maximum_voltage", "30000mV\n");
+    //Manager::instance()->setPowerDeliverySourceFixed(0, "dual_role_power", "no\n");
+    //Manager::instance()->setPowerDeliverySourceVariable(0, "maximum_current", "4000mA\n");
+    //Manager::instance()->setPowerDeliverySourceBattery(0, "maximum_power", "200000mW\n");
+    //Manager::instance()->setPowerDeliverySourcePPS(0, "maximum_voltage", "30000mV\n");
+    Manager::instance()->getAll();
+    cout << Manager::instance()->getList().toStyledString() << endl;
+    Manager::instance()->setPort(0, "data_role", "[device]\n");
+    Manager::instance()->setPort(0, "power_role", "source [sink]\n");
+    Manager::instance()->setPort(0, "port_type", "dual [source] sink\n");
+    Manager::instance()->setPort(0, "vconn_source", "yes\n");
+    Manager::instance()->setPort(0, "preferred_role", "source\n");
+    Manager::instance()->setAltMode(0, 1, "active", "no\n");
+    Manager::instance()->setDP(0, 1, "configuration", "USB [source] sink\n");
+    Manager::instance()->setDP(0, 1, "pin_assignment", "[C] D\n");
     Manager::instance()->getAll();
     cout << Manager::instance()->getList().toStyledString() << endl;
 

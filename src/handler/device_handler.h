@@ -28,6 +28,7 @@ private:
     std::list<shared_ptr<T>> devices;
     std::recursive_mutex mtx;
 public:
+    using value_type = T;
     DeviceHandler(string n):IDeviceHandler(n) {};
     ~DeviceHandler() {
         devices.clear();

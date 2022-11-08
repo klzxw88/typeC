@@ -54,6 +54,23 @@ public:
     bool getDP(int portIdx, int modeIdx);
     bool getWithPath(string p);
     bool setWithPath(string p, string attr, string value);
+    bool setPort(int portIdx, string attr, string value);
+    bool setPartner(int portIdx, string attr, string value);
+    bool setPartnerIdentity(int portIdx, string attr, string value);
+    bool setCable(int portIdx, string attr, string value);
+    bool setCableIdentity(int portIdx, string attr, string value);
+    bool setPlug(int portIdx, int plugIdx, string attr, string value);
+    bool setAltMode(int portIdx, int modeIdx, string attr, string value);
+    bool setDP(int portIdx, int modeIdx, string attr, string value);
+    bool setPowerDelivery(int portIdx, string attr, string value);
+    bool setPowerDeliverySinkFixed(int portIdx, string attr, string value);
+    bool setPowerDeliverySinkVariable(int portIdx, string attr, string value);
+    bool setPowerDeliverySinkBattery(int portIdx, string attr, string value);
+    bool setPowerDeliverySinkPPS(int portIdx, string attr, string value);
+    bool setPowerDeliverySourceFixed(int portIdx, string attr, string value);
+    bool setPowerDeliverySourceVariable(int portIdx, string attr, string value);
+    bool setPowerDeliverySourceBattery(int portIdx, string attr, string value);
+    bool setPowerDeliverySourcePPS(int portIdx, string attr, string value);
 };
 
 #endif
