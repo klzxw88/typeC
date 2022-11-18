@@ -40,7 +40,7 @@ Manager::Manager() {
     deviceHandlers.insert(make_pair(PDO_SINK_PPS, shared_ptr<IDeviceHandler>(new DeviceHandler<SinkPPS>(DEVTYPE_PDO))));
 };
 
-void Manager::processUdevEvent(UdevEvent* pUE) {
+void Manager::processUdevEvent(UdevEvent* pUE, bool verbose) {
     string type = pUE->getDevAttribute(DEVTYPE);
     if (type == DEVTYPE_PDO) {
         string path = pUE->getDevAttribute(DEVPATH);
@@ -73,6 +73,9 @@ void Manager::processUdevEvent(UdevEvent* pUE) {
     }
     if (deviceHandlers.find(type) != deviceHandlers.end()) {
         deviceHandlers[type]->processUdevEvent(pUE);
+		if (verbose) {
+			getList();
+		}
     }
 }
 
@@ -248,8 +251,8 @@ bool Manager::getWithPath(string p){
     }
 }
 
-void Manager::getAll() {
-    for (auto const& dir_entry : fs::recursive_directory_iterator(ROOT_PATH, fs::directory_options::follow_directory_symlink)) {
+void Manager::getAll(string path) {
+    for (auto const& dir_entry : fs::recursive_directory_iterator(path, fs::directory_options::follow_directory_symlink)) {
         if (fs::is_directory(dir_entry)) {
             if (dir_entry.path().filename() == "source_capabilities")
                 continue;
@@ -259,7 +262,6 @@ void Manager::getAll() {
         }
     }
 }
-
 
 Json::Value Manager::getList(string type) {
     Json::Value root;
@@ -279,6 +281,18 @@ Json::Value Manager::getList(string type) {
             root[PDO_SINK_BATTERY] = deviceHandlers[PDO_SINK_BATTERY]->getList();
             root[PDO_SINK_PPS] = deviceHandlers[PDO_SINK_PPS]->getList();
         }
+		else if (type == PDO_SOURCE) {
+            root[PDO_SOURCE_FIXED] = deviceHandlers[PDO_SOURCE_FIXED]->getList();
+            root[PDO_SOURCE_VARIABLE] = deviceHandlers[PDO_SOURCE_VARIABLE]->getList();
+            root[PDO_SOURCE_BATTERY] = deviceHandlers[PDO_SOURCE_BATTERY]->getList();
+            root[PDO_SOURCE_PPS] = deviceHandlers[PDO_SOURCE_PPS]->getList();
+		}
+		else if (type == PDO_SINK) {
+            root[PDO_SINK_FIXED] = deviceHandlers[PDO_SINK_FIXED]->getList();
+            root[PDO_SINK_VARIABLE] = deviceHandlers[PDO_SINK_VARIABLE]->getList();
+            root[PDO_SINK_BATTERY] = deviceHandlers[PDO_SINK_BATTERY]->getList();
+            root[PDO_SINK_PPS] = deviceHandlers[PDO_SINK_PPS]->getList();
+		}
         else if (deviceHandlers.find(type) != deviceHandlers.end()) {
             root[type] = deviceHandlers[type]->getList();
         }
@@ -431,6 +445,29 @@ bool Manager::setPowerDeliverySourceBattery(int portIdx, string attr, string val
 
 bool Manager::setPowerDeliverySourcePPS(int portIdx, string attr, string value) {
     return set(string(ROOT_PATH) + "/port" + to_string(portIdx) + "/usb_power_delivery/source_capabilities/4:pps", PDO_SOURCE_PPS, attr, value);
+}
+
+void Manager::clearList(string type) {
+    if (type.empty()) {
+        for (const auto& [key, value] : deviceHandlers) {
+            value->clearList();
+        }
+    }
+    else {
+        if (type == DEVTYPE_PDO) {
+            deviceHandlers[PDO_SOURCE_FIXED]->clearList();
+            deviceHandlers[PDO_SOURCE_VARIABLE]->clearList();
+            deviceHandlers[PDO_SOURCE_BATTERY]->clearList();
+            deviceHandlers[PDO_SOURCE_PPS]->clearList();
+            deviceHandlers[PDO_SINK_FIXED]->clearList();
+            deviceHandlers[PDO_SINK_VARIABLE]->clearList();
+            deviceHandlers[PDO_SINK_BATTERY]->clearList();
+            deviceHandlers[PDO_SINK_PPS]->clearList();
+        }
+        else if (deviceHandlers.find(type) != deviceHandlers.end()) {
+            deviceHandlers[type]->clearList();
+        }
+    }
 }
 
 /*
@@ -639,6 +676,7 @@ void testInterfacesPath() {
     }
 }
 */
+/*
 int main() {
     UdevListener::instance()->initListener();
 
@@ -647,7 +685,6 @@ int main() {
     //testInterfacesPath();
     Manager::instance()->getAll();
     cout << Manager::instance()->getList().toStyledString() << endl;
-    /*
     Manager::instance()->setWithPath("./sys/bus/typec/devices/port0/mode1/displayport/", "configuration", "[USB] source sink\n");
     Manager::instance()->setWithPath("./sys/bus/typec/devices/port0/mode1/displayport/", "pin_assignment", "A [B] C\n");
     //Manager::instance()->setWithPath("./sys/bus/typec/devices/port0/mode1/displayport/", "abc", "A [B] C\n");
@@ -670,7 +707,6 @@ int main() {
     Manager::instance()->setWithPath("./sys/class/typec/port0/", "preferred_role", "source\n");
     Manager::instance()->getAll();
     cout << Manager::instance()->getList().toStyledString() << endl;
-    */
     Manager::instance()->setPort(0, "data_role", "[host]\n");
     Manager::instance()->setPort(0, "power_role", "[source]\n");
     Manager::instance()->setPort(0, "port_type", "[source]\n");
@@ -712,3 +748,4 @@ int main() {
 
     return 0;
 }
+*/

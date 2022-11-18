@@ -18,6 +18,7 @@ class UdevListener : public Singleton<UdevListener> {
 private:
     friend class Singleton<UdevListener>;
     static atomic<bool> m_listenerRunning;
+    static atomic<bool> m_verbose;
     struct udev* m_udev;
     thread m_listenerThread;
     list<string> m_usbDevicePath;
@@ -29,8 +30,8 @@ private:
 public:
     ~UdevListener();
 
-    bool initListener();
-    bool startListener();
+    bool initListener(bool verbose = false);
+    bool startListener(bool verbose = false);
     bool stopListener();
     //virtual void onEvent(PdmNetlinkEvent *evn) = 0;
 

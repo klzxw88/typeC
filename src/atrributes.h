@@ -81,6 +81,16 @@ namespace DevAttributes {
     const string DEVTYPE_PDO = "pdo";
     const string DEVTYPE_TYPEC_ALTMODE = "typec_alternate_mode";
     const string DEVTYPE_DP = "displayport";
+    const string PDO_SOURCE = "pdo_source";
+    const string PDO_SOURCE_FIXED = "pdo_source_fixed";
+    const string PDO_SOURCE_VARIABLE = "pdo_source_variable";
+    const string PDO_SOURCE_BATTERY = "pdo_source_battery";
+    const string PDO_SOURCE_PPS = "pdo_source_pps";
+    const string PDO_SINK = "pdo_sink";
+    const string PDO_SINK_FIXED = "pdo_sink_fixed";
+    const string PDO_SINK_VARIABLE = "pdo_sink_variable";
+    const string PDO_SINK_BATTERY = "pdo_sink_battery";
+    const string PDO_SINK_PPS = "pdo_sink_pps";
 };
 
 #endif /* DEVATTRIBUTES_H_ */

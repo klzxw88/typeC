@@ -1,6 +1,3 @@
-#include "udev_listener.h"
-#include "udev_event.h"
-
 #include <glib.h>
 #include <libudev.h>
 #include <stdarg.h>
@@ -12,12 +9,17 @@
 #include <thread>
 #include <iostream>
 
+#include "udev_listener.h"
+#include "udev_event.h"
+#include "manager.h"
+
 #define memzero(x,l) (memset((x), 0, (l)))
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 using namespace DevAttributes;
 
 atomic<bool> UdevListener::m_listenerRunning = false;
+atomic<bool> UdevListener::m_verbose = false;
 
 UdevListener::UdevListener(): m_udev(nullptr) {
 }
@@ -26,11 +28,11 @@ UdevListener::~UdevListener() {
     stopListener();
 }
 
-bool UdevListener::initListener() {
+bool UdevListener::initListener(bool verbose) {
     //cout << "UdevListener::" << __FUNCTION__ << endl;
     bool initDone = false;
     if (init()) {
-        if (startListener()) {
+        if (startListener(verbose)) {
             enumerate_devices();
         }
         initDone = true;
@@ -38,8 +40,12 @@ bool UdevListener::initListener() {
     return initDone;
 }
 
-bool UdevListener::startListener() {
+bool UdevListener::startListener(bool verbose) {
     //cout << "UdevListener::" << __FUNCTION__ << endl;
+	if (m_listenerRunning) {
+		return false;
+	}
+	m_verbose = verbose;
     m_listenerRunning = true;
     m_listenerThread = thread(&UdevListener::threadStart,this);
     return true;
@@ -149,7 +155,8 @@ void UdevListener::threadStart() {
                 UdevEvent *pNE = new (nothrow) UdevEvent;
                 if (pNE) {
                     pNE->parser(device, true);
-                    //onEvent(pNE);
+					Manager::instance()->processUdevEvent(pNE, m_verbose);
+            		delete pNE;
                 }
                 else {
                     cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " memory failure for PdmNetlinkEvent" << endl;
@@ -210,8 +217,8 @@ void UdevListener::enumerate_subsystem_devices(string subSys) {
             //cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Parent device " << path << endl;
             UdevEvent *pNE = new UdevEvent;
             pNE->parser(device, false);
+			Manager::instance()->processUdevEvent(pNE, m_verbose);
             delete pNE;
-            //onEvent(pNE);
         }
         udev_device_unref(device);
     }
