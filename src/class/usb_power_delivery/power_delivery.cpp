@@ -11,7 +11,7 @@ PowerDelivery::PowerDelivery(string path)
     addMap(version);
 
     getSysFSAll();
-/*    
+/*
     cout << toJson().toStyledString() << endl;
     cout << sysFStoJson().toStyledString() << endl;
 */

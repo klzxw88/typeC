@@ -35,7 +35,7 @@ bool writeToFile(string fileToWrite, T &usbData) {
         return false;
     }
 }
-    
+
 string getRealPath(string path) {
     fs::path p(path);
     if (!fs::exists(p)) {

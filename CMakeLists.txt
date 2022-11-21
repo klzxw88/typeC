@@ -8,7 +8,7 @@ pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -g")
 
-set(BIN_NAME typeC)
+set(BIN_NAME test_usb_typec)
 file(GLOB_RECURSE UTILS_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.cpp)
 file(GLOB_RECURSE UDEV_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/udev/*.cpp)
 file(GLOB_RECURSE CLASS_TYPEC_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/class/typec/*.cpp)
@@ -37,8 +37,8 @@ message(STATUS "${UTILS_SRC_FILES} ${CLASS_TYPEC_SRC_FILES} ${CLASS_PD_SRC_FILES
 add_executable(${BIN_NAME} ${UTILS_SRC_FILES} ${CLASS_TYPEC_SRC_FILES} ${CLASS_PD_SRC_FILES} ${BUS_TYPEC_SRC_FILES} ${BUS_DP_SRC_FILES} ${SRC_FILES} )
 
 target_link_libraries(${BIN_NAME}
-	${UDEV_LDFLAGS}
-	${GLIB_LIBRARIES}
-	jsoncpp
-	pthread
-	)
+    ${UDEV_LDFLAGS}
+    ${GLIB_LIBRARIES}
+    jsoncpp
+    pthread
+    )

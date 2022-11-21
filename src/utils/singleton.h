@@ -1,5 +1,5 @@
-#ifndef SINGLETON_H  
-#define SINGLETON_H  
+#ifndef SINGLETON_H
+#define SINGLETON_H
 
 #include <memory>
 
@@ -28,4 +28,4 @@ T* Singleton<T>::instance() {
 template <typename T>
 T* Singleton<T>::_instance = nullptr;
 
-#endif  
+#endif

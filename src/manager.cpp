@@ -53,7 +53,7 @@ void Manager::processUdevEvent(UdevEvent* pUE, bool verbose) {
         else {
             cout << "invalid path : " << path << endl;
         }
-        
+
         if (path.find("fixed_supply") != string::npos) {
             type += "_fixed";
         }
@@ -73,9 +73,9 @@ void Manager::processUdevEvent(UdevEvent* pUE, bool verbose) {
     }
     if (deviceHandlers.find(type) != deviceHandlers.end()) {
         deviceHandlers[type]->processUdevEvent(pUE);
-		if (verbose) {
-			getList();
-		}
+        if (verbose) {
+            getList();
+        }
     }
 }
 
@@ -252,6 +252,10 @@ bool Manager::getWithPath(string p){
 }
 
 void Manager::getAll(string path) {
+    if (!fs::exists(path)) {
+        cout << "not exist folder : " << path << endl;
+        return;
+    }
     for (auto const& dir_entry : fs::recursive_directory_iterator(path, fs::directory_options::follow_directory_symlink)) {
         if (fs::is_directory(dir_entry)) {
             if (dir_entry.path().filename() == "source_capabilities")
@@ -281,18 +285,18 @@ Json::Value Manager::getList(string type) {
             root[PDO_SINK_BATTERY] = deviceHandlers[PDO_SINK_BATTERY]->getList();
             root[PDO_SINK_PPS] = deviceHandlers[PDO_SINK_PPS]->getList();
         }
-		else if (type == PDO_SOURCE) {
+        else if (type == PDO_SOURCE) {
             root[PDO_SOURCE_FIXED] = deviceHandlers[PDO_SOURCE_FIXED]->getList();
             root[PDO_SOURCE_VARIABLE] = deviceHandlers[PDO_SOURCE_VARIABLE]->getList();
             root[PDO_SOURCE_BATTERY] = deviceHandlers[PDO_SOURCE_BATTERY]->getList();
             root[PDO_SOURCE_PPS] = deviceHandlers[PDO_SOURCE_PPS]->getList();
-		}
-		else if (type == PDO_SINK) {
+        }
+        else if (type == PDO_SINK) {
             root[PDO_SINK_FIXED] = deviceHandlers[PDO_SINK_FIXED]->getList();
             root[PDO_SINK_VARIABLE] = deviceHandlers[PDO_SINK_VARIABLE]->getList();
             root[PDO_SINK_BATTERY] = deviceHandlers[PDO_SINK_BATTERY]->getList();
             root[PDO_SINK_PPS] = deviceHandlers[PDO_SINK_PPS]->getList();
-		}
+        }
         else if (deviceHandlers.find(type) != deviceHandlers.end()) {
             root[type] = deviceHandlers[type]->getList();
         }
@@ -490,7 +494,7 @@ void testUdevEvent() {
     event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_ADD));
     Manager::instance()->processUdevEvent(event.get());
     event->mdeviceInfo.clear();
-    
+
     event->mdeviceInfo.insert(make_pair(DEVPATH,"./sys/class/typec/port0/port0-cable/"));
     event->mdeviceInfo.insert(make_pair(DEVTYPE,DEVTYPE_TYPEC_CABLE));
     event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_ADD));
@@ -508,7 +512,7 @@ void testUdevEvent() {
     event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_CHANGE));
     Manager::instance()->processUdevEvent(event.get());
     event->mdeviceInfo.clear();
-    
+
     event->mdeviceInfo.insert(make_pair(DEVPATH,"./sys/class/typec/port0/port0-cable/"));
     event->mdeviceInfo.insert(make_pair(DEVTYPE,DEVTYPE_TYPEC_CABLE));
     event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_REMOVE));
@@ -532,7 +536,7 @@ void testUdevEvent() {
     event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_ADD));
     Manager::instance()->processUdevEvent(event.get());
     event->mdeviceInfo.clear();
-    
+
     event->mdeviceInfo.insert(make_pair(DEVPATH,"./sys/class/typec/port0/usb_power_delivery/"));
     event->mdeviceInfo.insert(make_pair(DEVTYPE,DEVTYPE_USB_POWER_DELIVERY));
     event->mdeviceInfo.insert(make_pair(ACTION,DEVICE_ADD));

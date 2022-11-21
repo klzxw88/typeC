@@ -35,7 +35,7 @@ SourceFixedSupply::SourceFixedSupply(string path)
     addMap(maximum_current);
 
     getSysFSAll();
-/*    
+/*
     cout << toJson().toStyledString() << endl;
     cout << sysFStoJson().toStyledString() << endl;
 */

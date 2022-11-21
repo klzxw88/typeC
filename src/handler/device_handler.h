@@ -20,7 +20,7 @@ public:
     virtual bool set(string path, string attr, string value) = 0;
     virtual bool processUdevEvent(UdevEvent* pUE) = 0;
     virtual Json::Value getList() = 0;
-	virtual void clearList() = 0;
+    virtual void clearList() = 0;
 };
 
 template <typename T>
@@ -38,7 +38,7 @@ public:
     void get(string path) override;
     Json::Value getList() override;
     bool set(string devpath, string attr, string value) override;
-	void clearList() override { devices.clear(); };
+    void clearList() override { devices.clear(); };
 };
 
 template <typename T>

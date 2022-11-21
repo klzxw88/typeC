@@ -1,7 +1,7 @@
 #include "port.h"
 // https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-typec
 
-Port::Port(string path)    : SysFS(path) { 
+Port::Port(string path)    : SysFS(path) {
     // data_role
     SysFSValue<int>* data_role = new SysFSValue<int>(path, "data_role", true);
     data_role->add("[device]\n", DATA_ROLE_DEVICE);

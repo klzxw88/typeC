@@ -78,7 +78,7 @@ Json::Value SysFS::sysFStoJson() {
     }
     return root;
 }
-    
+
 bool SysFS::set(string name, string value) {
     return set(name, value, devpath);
 }

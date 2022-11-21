@@ -5,7 +5,7 @@ Identity::Identity(string path)
     // id_header
     SysFSValue<bitset<32>>* id_header = new SysFSValue<bitset<32>>(path, "id_header", false);
     addMap(id_header);
-    
+
     // cert_stat
     SysFSValue<bitset<32>>* cert_stat = new SysFSValue<bitset<32>>(path, "cert_stat", false);
     addMap(cert_stat);
@@ -27,7 +27,7 @@ Identity::Identity(string path)
     addMap(product_type_vdo3);
 
     getSysFSAll();
-/*    
+/*
     cout << toJson().toStyledString() << endl;
     cout << sysFStoJson().toStyledString() << endl;
 */

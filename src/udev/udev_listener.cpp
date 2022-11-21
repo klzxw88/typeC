@@ -42,10 +42,10 @@ bool UdevListener::initListener(bool verbose) {
 
 bool UdevListener::startListener(bool verbose) {
     //cout << "UdevListener::" << __FUNCTION__ << endl;
-	if (m_listenerRunning) {
-		return false;
-	}
-	m_verbose = verbose;
+    if (m_listenerRunning) {
+        return false;
+    }
+    m_verbose = verbose;
     m_listenerRunning = true;
     m_listenerThread = thread(&UdevListener::threadStart,this);
     return true;
@@ -155,8 +155,8 @@ void UdevListener::threadStart() {
                 UdevEvent *pNE = new (nothrow) UdevEvent;
                 if (pNE) {
                     pNE->parser(device, true);
-					Manager::instance()->processUdevEvent(pNE, m_verbose);
-            		delete pNE;
+                    Manager::instance()->processUdevEvent(pNE, m_verbose);
+                    delete pNE;
                 }
                 else {
                     cout << "UdevListener::" << __FUNCTION__ << " line: " << __LINE__ << " memory failure for PdmNetlinkEvent" << endl;
@@ -217,7 +217,7 @@ void UdevListener::enumerate_subsystem_devices(string subSys) {
             //cout << "UdevListener::" << __FUNCTION__ << " line:" << __LINE__ << " Parent device " << path << endl;
             UdevEvent *pNE = new UdevEvent;
             pNE->parser(device, false);
-			Manager::instance()->processUdevEvent(pNE, m_verbose);
+            Manager::instance()->processUdevEvent(pNE, m_verbose);
             delete pNE;
         }
         udev_device_unref(device);
