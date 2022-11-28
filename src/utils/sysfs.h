@@ -4,7 +4,6 @@
 #include <filesystem>
 #include <list>
 #include <memory>
-#include <json/json.h>
 #include "utils.h"
 #include "sysfsvalue.h"
 
@@ -14,6 +13,7 @@ namespace fs = std::filesystem;
 
 class SysFS {
 private:
+    string devtype;
     map<string, string> sysfsValue;
 
 protected:
@@ -25,7 +25,7 @@ protected:
     void getSysFS(string file);
     void getSysFS(string file, string path);
 public:
-    SysFS(string path);
+    SysFS(string type, string path);
     ~SysFS() = default;
 
     void getSysFSAll();

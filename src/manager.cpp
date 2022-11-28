@@ -1,43 +1,27 @@
 #include "manager.h"
 #include "atrributes.h"
 #include "device_handler.h"
-#include "altmode.h"
-#include "displayport.h"
-#include "power_delivery.h"
-#include "port.h"
-#include "partner.h"
-#include "plug.h"
-#include "cable.h"
-#include "identity.h"
-#include "source_fixed_supply.h"
-#include "source_variable_supply.h"
-#include "source_battery.h"
-#include "source_pps.h"
-#include "sink_fixed_supply.h"
-#include "sink_variable_supply.h"
-#include "sink_battery.h"
-#include "sink_pps.h"
 #include "udev_listener.h"
 
 using namespace DevAttributes;
 
 Manager::Manager() {
-    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_PORT, shared_ptr<IDeviceHandler>(new DeviceHandler<Port>(DEVTYPE_TYPEC_PORT))));
-    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_PARTNER, shared_ptr<IDeviceHandler>(new DeviceHandler<Partner>(DEVTYPE_TYPEC_PARTNER))));
-    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_CABLE, shared_ptr<IDeviceHandler>(new DeviceHandler<Cable>(DEVTYPE_TYPEC_CABLE))));
-    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_PLUG, shared_ptr<IDeviceHandler>(new DeviceHandler<Plug>(DEVTYPE_TYPEC_PLUG))));
-    deviceHandlers.insert(make_pair(DEVTYPE_IDENTITY, shared_ptr<IDeviceHandler>(new DeviceHandler<Identity>(DEVTYPE_IDENTITY))));
-    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_ALTMODE, shared_ptr<IDeviceHandler>(new DeviceHandler<AlternateMode>(DEVTYPE_TYPEC_ALTMODE))));
-    deviceHandlers.insert(make_pair(DEVTYPE_DP, shared_ptr<IDeviceHandler>(new DeviceHandler<DisplayPort>(DEVTYPE_DP))));
-    deviceHandlers.insert(make_pair(DEVTYPE_USB_POWER_DELIVERY, shared_ptr<IDeviceHandler>(new DeviceHandler<PowerDelivery>(DEVTYPE_USB_POWER_DELIVERY))));
-    deviceHandlers.insert(make_pair(PDO_SOURCE_FIXED, shared_ptr<IDeviceHandler>(new DeviceHandler<SourceFixedSupply>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SOURCE_VARIABLE, shared_ptr<IDeviceHandler>(new DeviceHandler<SourceVariableSupply>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SOURCE_BATTERY, shared_ptr<IDeviceHandler>(new DeviceHandler<SourceBattery>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SOURCE_PPS, shared_ptr<IDeviceHandler>(new DeviceHandler<SourcePPS>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SINK_FIXED, shared_ptr<IDeviceHandler>(new DeviceHandler<SinkFixedSupply>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SINK_VARIABLE, shared_ptr<IDeviceHandler>(new DeviceHandler<SinkVariableSupply>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SINK_BATTERY, shared_ptr<IDeviceHandler>(new DeviceHandler<SinkBattery>(DEVTYPE_PDO))));
-    deviceHandlers.insert(make_pair(PDO_SINK_PPS, shared_ptr<IDeviceHandler>(new DeviceHandler<SinkPPS>(DEVTYPE_PDO))));
+    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_PORT, make_shared<DeviceHandler>(DEVTYPE_TYPEC_PORT)));
+    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_PARTNER, make_shared<DeviceHandler>(DEVTYPE_TYPEC_PARTNER)));
+    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_CABLE, make_shared<DeviceHandler>(DEVTYPE_TYPEC_CABLE)));
+    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_PLUG, make_shared<DeviceHandler>(DEVTYPE_TYPEC_PLUG)));
+    deviceHandlers.insert(make_pair(DEVTYPE_IDENTITY, make_shared<DeviceHandler>(DEVTYPE_IDENTITY)));
+    deviceHandlers.insert(make_pair(DEVTYPE_TYPEC_ALTMODE, make_shared<DeviceHandler>(DEVTYPE_TYPEC_ALTMODE)));
+    deviceHandlers.insert(make_pair(DEVTYPE_DP, make_shared<DeviceHandler>(DEVTYPE_DP)));
+    deviceHandlers.insert(make_pair(DEVTYPE_USB_POWER_DELIVERY, make_shared<DeviceHandler>(DEVTYPE_USB_POWER_DELIVERY)));
+    deviceHandlers.insert(make_pair(PDO_SOURCE_FIXED, make_shared<DeviceHandler>(PDO_SOURCE_FIXED)));
+    deviceHandlers.insert(make_pair(PDO_SOURCE_VARIABLE, make_shared<DeviceHandler>(PDO_SOURCE_VARIABLE)));
+    deviceHandlers.insert(make_pair(PDO_SOURCE_BATTERY, make_shared<DeviceHandler>(PDO_SOURCE_BATTERY)));
+    deviceHandlers.insert(make_pair(PDO_SOURCE_PPS, make_shared<DeviceHandler>(PDO_SOURCE_PPS)));
+    deviceHandlers.insert(make_pair(PDO_SINK_FIXED, make_shared<DeviceHandler>(PDO_SINK_FIXED)));
+    deviceHandlers.insert(make_pair(PDO_SINK_VARIABLE, make_shared<DeviceHandler>(PDO_SINK_VARIABLE)));
+    deviceHandlers.insert(make_pair(PDO_SINK_BATTERY, make_shared<DeviceHandler>(PDO_SINK_BATTERY)));
+    deviceHandlers.insert(make_pair(PDO_SINK_PPS, make_shared<DeviceHandler>(PDO_SINK_PPS)));
 };
 
 void Manager::processUdevEvent(UdevEvent* pUE, bool verbose) {

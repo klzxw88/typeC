@@ -56,3 +56,10 @@ string getRealPath(string path) {
     }
     return devpath;
 }
+
+Json::Value readJson(string filePath) {
+    ifstream f(filePath);
+    Json::Value value;
+    f >> value;
+    return value;
+}

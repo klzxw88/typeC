@@ -16,7 +16,7 @@ class Manager : public Singleton<Manager> {
 private:
     friend class Singleton<Manager>;
     Manager();
-    map<string, shared_ptr<IDeviceHandler>> deviceHandlers;
+    map<string, shared_ptr<DeviceHandler>> deviceHandlers;
     bool get(string path, string type);
     bool set(string path, string type, string attr, string value);
 

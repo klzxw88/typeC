@@ -15,11 +15,11 @@ void printDebugMenu() {
     cout << "0x03:   print all partners" << endl;
     cout << "0x04:   print all cables" << endl;
     cout << "0x05:   print all plugs" << endl;
-    cout << "0x06:   print all PDO(Power Delivery Object)s" << endl;
+    cout << "0x06:   print all PD(Power Delivery)s" << endl;
     cout << "0x07:   print all altmodes" << endl;
     cout << "0x08:   print all DP(Display Port) alt modes" << endl;
     cout << "0x09:   print all identities" << endl;
-    cout << "0x0a:   print all PD values" << endl;
+    cout << "0x0a:   print all PDO(Power Delivery Object) values" << endl;
     cout << "0x0b:   print all PD sources" << endl;
     cout << "0x0c:   print all PD fixed sources" << endl;
     cout << "0x0d:   print all PD variable sources" << endl;
@@ -38,17 +38,18 @@ void printDebugMenu() {
     cout << "0x25:   get plug values" << endl;
     cout << "0x26:   get altmode values" << endl;
     cout << "0x27:   get DP values" << endl;
-    cout << "0x28:   get PD values" << endl;
-    cout << "0x29:   get PD sources" << endl;
-    cout << "0x2a:   get DP fixed sources" << endl;
-    cout << "0x2b:   get DP variable sources" << endl;
-    cout << "0x2c:   get DP battery sources" << endl;
-    cout << "0x2d:   get DP pps sources" << endl;
-    cout << "0x2e:   get DP sinks" << endl;
-    cout << "0x2f:   get DP fixed sinks" << endl;
-    cout << "0x30:   get DP variable sinks" << endl;
-    cout << "0x31:   get DP battery sinks" << endl;
-    cout << "0x32:   get DP pps sinks" << endl;
+    cout << "0x28:   get PD(Power Delivery) values" << endl;
+    cout << "0x29:   get PDO(Power Delivery Object) values" << endl;
+    cout << "0x2a:   get PD sources" << endl;
+    cout << "0x2b:   get PD fixed sources" << endl;
+    cout << "0x2c:   get PD variable sources" << endl;
+    cout << "0x2d:   get PD battery sources" << endl;
+    cout << "0x2e:   get PD pps sources" << endl;
+    cout << "0x2f:   get PD sinks" << endl;
+    cout << "0x30:   get PD fixed sinks" << endl;
+    cout << "0x31:   get PD variable sinks" << endl;
+    cout << "0x32:   get PD battery sinks" << endl;
+    cout << "0x33:   get PD pps sinks" << endl;
     cout << "0x40:   get all sysfs values for usb type-C with path" << endl;
     cout << "0x41:   start udev monitor" << endl;
     cout << "0x42:   stop udev monitor" << endl;
@@ -110,7 +111,7 @@ void selectMenu() {
             case 6:
                 Manager::instance()->clearList();
                 Manager::instance()->getAll();
-                cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
+                cout << Manager::instance()->getList(DEVTYPE_USB_POWER_DELIVERY).toStyledString() << endl;
                 break;
             case 7:
                 Manager::instance()->clearList();
@@ -214,6 +215,7 @@ void selectMenu() {
                     break;
                 }
                 cout << Manager::instance()->getList(DEVTYPE_IDENTITY).toStyledString() << endl;
+                break;
             case 35:
                 Manager::instance()->clearList(DEVTYPE_TYPEC_CABLE);
                 cout << "Enter port index >> ";
@@ -279,6 +281,17 @@ void selectMenu() {
                 cout << Manager::instance()->getList(DEVTYPE_DP).toStyledString() << endl;
                 break;
             case 40:
+                Manager::instance()->clearList(DEVTYPE_USB_POWER_DELIVERY);
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPowerDelivery(portIdx)) {
+                    cout << "print PD(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_USB_POWER_DELIVERY).toStyledString() << endl;
+                break;
+            case 41:
                 Manager::instance()->clearList(DEVTYPE_PDO);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -289,7 +302,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(DEVTYPE_PDO).toStyledString() << endl;
                 break;
-            case 41:
+            case 42:
                 Manager::instance()->clearList(PDO_SOURCE);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -300,7 +313,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SOURCE).toStyledString() << endl;
                 break;
-            case 42:
+            case 43:
                 Manager::instance()->clearList(PDO_SOURCE_FIXED);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -311,7 +324,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SOURCE_FIXED).toStyledString() << endl;
                 break;
-            case 43:
+            case 44:
                 Manager::instance()->clearList(PDO_SOURCE_VARIABLE);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -322,7 +335,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SOURCE_VARIABLE).toStyledString() << endl;
                 break;
-            case 44:
+            case 45:
                 Manager::instance()->clearList(PDO_SOURCE_BATTERY);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -333,7 +346,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SOURCE_BATTERY).toStyledString() << endl;
                 break;
-            case 45:
+            case 46:
                 Manager::instance()->clearList(PDO_SOURCE_PPS);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -344,7 +357,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SOURCE_PPS).toStyledString() << endl;
                 break;
-            case 46:
+            case 47:
                 Manager::instance()->clearList(PDO_SINK);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -355,7 +368,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SINK).toStyledString() << endl;
                 break;
-            case 47:
+            case 48:
                 Manager::instance()->clearList(PDO_SINK_FIXED);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -366,7 +379,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SINK_FIXED).toStyledString() << endl;
                 break;
-            case 48:
+            case 49:
                 Manager::instance()->clearList(PDO_SINK_VARIABLE);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -377,7 +390,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SINK_VARIABLE).toStyledString() << endl;
                 break;
-            case 49:
+            case 50:
                 Manager::instance()->clearList(PDO_SINK_BATTERY);
                 cout << "Enter port index >> ";
                 getline(cin, line);
@@ -388,7 +401,7 @@ void selectMenu() {
                 }
                 cout << Manager::instance()->getList(PDO_SINK_BATTERY).toStyledString() << endl;
                 break;
-            case 50:
+            case 51:
                 Manager::instance()->clearList(PDO_SINK_PPS);
                 cout << "Enter port index >> ";
                 getline(cin, line);

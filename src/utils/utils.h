@@ -6,9 +6,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <json/json.h>
 
 using namespace std;
 
+Json::Value readJson(string filePath);
 bool readFromFile(string fileToRead, string &usbData);
 template<typename T> bool writeToFile(std::string fileToWrite, T &usbData);
 string &rtrim(string &s);
