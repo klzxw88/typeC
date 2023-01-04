@@ -240,13 +240,20 @@ void Manager::getAll(string path) {
         cout << "not exist folder : " << path << endl;
         return;
     }
-    for (auto const& dir_entry : fs::recursive_directory_iterator(path, fs::directory_options::follow_directory_symlink)) {
-        if (fs::is_directory(dir_entry)) {
-            if (dir_entry.path().filename() == "source_capabilities")
+    for(auto i = fs::recursive_directory_iterator(path, fs::directory_options::follow_directory_symlink); i != fs::recursive_directory_iterator(); ++i ) {
+        if (i.depth() > 5) {
+            break;
+        }
+        if (i->path().filename() == "driver" || i->path().filename() == "of_node" || i->path().filename() == "device") {
+            continue;
+        }
+        cout << *i << endl;
+        if (fs::is_directory(*i)) {
+            if (i->path().filename() == "source_capabilities")
                 continue;
-            if (dir_entry.path().filename() == "sink_capabilities")
+            if (i->path().filename() == "sink_capabilities")
                 continue;
-            getWithPath(dir_entry.path().string());
+            getWithPath(i->path().string());
         }
     }
 }
