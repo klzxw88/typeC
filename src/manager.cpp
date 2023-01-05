@@ -374,8 +374,7 @@ bool Manager::set(string path, string type, string attr, string value) {
         return false;
     }
     devpath += "/";
-    deviceHandlers[type]->set(devpath, attr, value);
-    return true;
+    return deviceHandlers[type]->set(devpath, attr, value);
 }
 
 bool Manager::setPort(int portIdx, string attr, string value) {

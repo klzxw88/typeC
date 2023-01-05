@@ -134,6 +134,10 @@ bool SysFS::set(string name, string value, string path) {
             cout << "attribute(" << name << ") is read-only" << endl;
             return false;
         }
+        if ((fs::status(path+name).permissions() & fs::perms::owner_write) == fs::perms::none) {
+            cout << path+name << " didn't have owner write permission" << endl;
+            return false;
+        }
         if (!mapSysValue[name]->load(value)) {
             cout << "invalid value(" << value << ") for attribute(" << name << ")" << endl;
             return false;
@@ -143,7 +147,7 @@ bool SysFS::set(string name, string value, string path) {
         if (mapSysValue[name]->to_string() == value) {
             return true;
         }
-        return true;
+        return false;
     }
     else {
         cout << name << " is not attribute in path(" << devpath << ")" << endl;

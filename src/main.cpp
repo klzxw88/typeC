@@ -1,6 +1,7 @@
 #include <iostream>
 #include "manager.h"
 #include "udev_listener.h"
+#include "configuration.h"
 
 using namespace std;
 
@@ -53,6 +54,12 @@ void printDebugMenu() {
     cout << "0x40:   get all sysfs values for usb type-C with path" << endl;
     cout << "0x41:   start udev monitor" << endl;
     cout << "0x42:   stop udev monitor" << endl;
+    cout << "0x50:   set Port data_role value" << endl;
+    cout << "0x51:   set Port power_role value" << endl;
+    cout << "0x52:   set Port port_type value" << endl;
+    cout << "0x53:   set Port vconn_source value" << endl;
+    cout << "0x54:   set Port supported_accessory_modes value" << endl;
+    cout << "0x58:   set altmode active value" << endl;
     cout << "======================================================================" << endl;
     cout << "0xff:   Exit [usb type-c debug menu]" << endl;
     cout << "======================================================================" << endl;
@@ -73,6 +80,76 @@ int stringToInt(string line) {
     return val;
 }
 
+string getValue(string name) {
+    string line;
+    Json::Value attribute = Configuration::instance()->getAttribute(name);
+    string valueType = attribute["type"].asString();
+    if (valueType == "string") {
+        cout << "Enter new " + name + " value >> ";
+        getline(cin, line);
+        return line+"\n";
+    }
+    else if (valueType == "bitset<32>") {
+        cout << "Enter new " + name + " value >> ";
+        getline(cin, line);
+        if (line[0] == '0' && line[1] == 'x') {
+            line = line.substr(2, line.length()-2);
+            stringstream ss;
+            unsigned int iVal;
+            ss << std::hex << line;
+            ss >> iVal;
+            return to_string(iVal);
+        }
+        else if (std::all_of(line.begin(), line.end()-2, ::isxdigit)) {
+            stringstream ss;
+            unsigned int iVal;
+            ss << std::hex << line;
+            ss >> iVal;
+            return to_string(iVal);
+        }
+        else {
+            cout << "invalid value : " << line << endl;
+            return "";
+        }
+    }
+    else if (valueType == "bool") {
+        cout << "Enter new " + name + " value (yes/no) >> ";
+        getline(cin, line);
+        if (line != "yes" && line != "no") {
+            cout << "invalid value : " << line << endl;
+            return "";
+        }
+        return line+"\n";
+    }
+    else if (valueType == "int") {
+        cout << "Enter new " + name + " value >> ";
+        getline(cin, line);
+        if (!line.empty() && std::all_of(line.begin(), line.end(), ::isdigit)) {
+            return line;
+        }
+        else {
+            cout << "invalid value : " << line << endl;
+            return "";
+        }
+    }
+    else if (valueType == "enum") {
+        int i=0;
+        map<int, string> values;
+        for (string item : attribute["values"].getMemberNames()) {
+            values.insert(make_pair(i, item));
+            cout << "[" << i++ << "]\t" << item.erase(item.length()-1) << endl;
+        }
+        cout << "Enter new " + name + " value >> ";
+        getline(cin, line);
+        int index = stringToInt(line);
+        if (0 > index || index >= i) {
+            cout << "invalid index selected" << endl;
+            return "";
+        }
+        return values[index];
+    }
+    return "";
+}
 
 void selectMenu() {
     int portIdx = -1, plugIdx = -1, modeIdx = -1;
@@ -423,6 +500,129 @@ void selectMenu() {
                 break;
             case 66:
                 UdevListener::instance()->stopListener();
+                break;
+            case 80:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPort(portIdx)) {
+                    cout << "get port(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                if ((line = getValue("data_role")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setPort(portIdx, "data_role", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+                break;
+            case 81:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPort(portIdx)) {
+                    cout << "get port(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                if ((line = getValue("power_role")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setPort(portIdx, "power_role", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+                break;
+            case 82:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPort(portIdx)) {
+                    cout << "get port(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                if ((line = getValue("port_type")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setPort(portIdx, "port_type", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+                break;
+            case 83:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPort(portIdx)) {
+                    cout << "get port(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                if ((line = getValue("vconn_source")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setPort(portIdx, "vconn_source", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+                break;
+            case 84:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPort(portIdx)) {
+                    cout << "get port(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                if ((line = getValue("supported_accessory_modes")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setPort(portIdx, "supported_accessory_modes", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+                break;
+            case 88:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                cout << "Enter mode index >> ";
+                getline(cin, line);
+                modeIdx = stringToInt(line);
+                if (!Manager::instance()->getAltMode(portIdx, modeIdx)) {
+                    cout << "print altmode(portIdx:" << portIdx << ", modeIdx:" << modeIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_ALTMODE).toStyledString() << endl;
+                if ((line = getValue("active")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setAltMode(portIdx, modeIdx, "active", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_ALTMODE).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
                 break;
             case 255:
                 break;

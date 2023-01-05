@@ -132,7 +132,7 @@ string SysFSValue<T>::to_string() {
         return value.to_string();
     }
     else if constexpr (is_same_v<T, bool>) {
-        return value?"yes":"no";
+        return value?"yes\n":"no\n";
     }
     else if (table.empty()) {
         return to_string(value);

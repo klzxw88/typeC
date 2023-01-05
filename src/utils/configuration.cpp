@@ -2,7 +2,7 @@
 #include "utils.h"
 
 Configuration::Configuration() {
-    m_conf = readJson("file/conf/type-c.conf");
+    m_conf = readJson("files/conf/type-c.conf");
 }
 
 Json::Value Configuration::getAttribute(string name) {
