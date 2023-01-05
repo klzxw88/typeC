@@ -54,12 +54,14 @@ void printDebugMenu() {
     cout << "0x40:   get all sysfs values for usb type-C with path" << endl;
     cout << "0x41:   start udev monitor" << endl;
     cout << "0x42:   stop udev monitor" << endl;
-    cout << "0x50:   set Port data_role value" << endl;
-    cout << "0x51:   set Port power_role value" << endl;
-    cout << "0x52:   set Port port_type value" << endl;
-    cout << "0x53:   set Port vconn_source value" << endl;
-    cout << "0x54:   set Port supported_accessory_modes value" << endl;
-    cout << "0x58:   set altmode active value" << endl;
+    cout << "0x50:   set port data_role value" << endl;
+    cout << "0x51:   set port power_role value" << endl;
+    cout << "0x52:   set port port_type value" << endl;
+    cout << "0x53:   set port vconn_source value" << endl;
+    cout << "0x54:   set port preferred_role value" << endl;
+    cout << "0x55:   set altmode active value" << endl;
+    cout << "0x56:   set displayport configuration value" << endl;
+    cout << "0x57:   set displayport pin_assignment value" << endl;
     cout << "======================================================================" << endl;
     cout << "0xff:   Exit [usb type-c debug menu]" << endl;
     cout << "======================================================================" << endl;
@@ -590,10 +592,10 @@ void selectMenu() {
                     break;
                 }
                 cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
-                if ((line = getValue("supported_accessory_modes")).empty()) {
+                if ((line = getValue("preferred_role")).empty()) {
                     break;
                 }
-                if (Manager::instance()->setPort(portIdx, "supported_accessory_modes", line)) {
+                if (Manager::instance()->setPort(portIdx, "preferred_role", line)) {
                     cout << "retValue : true" << endl;
                     cout << Manager::instance()->getList(DEVTYPE_TYPEC_PORT).toStyledString() << endl;
                 }
@@ -601,7 +603,27 @@ void selectMenu() {
                     cout << "retValue : false" << endl;
                 }
                 break;
-            case 88:
+            case 85:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                if (!Manager::instance()->getPartner(portIdx)) {
+                    cout << "print partner(portIdx:" << portIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_TYPEC_PARTNER).toStyledString() << endl;
+                if ((line = getValue("supports_usb_power_delivery")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setPartner(portIdx, "supports_usb_power_delivery", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_TYPEC_PARTNER).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+                break;
+            case 86:
                 cout << "Enter port index >> ";
                 getline(cin, line);
                 portIdx = stringToInt(line);
@@ -624,6 +646,52 @@ void selectMenu() {
                     cout << "retValue : false" << endl;
                 }
                 break;
+            case 87:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                cout << "Enter mode index >> ";
+                getline(cin, line);
+                modeIdx = stringToInt(line);
+                if (!Manager::instance()->getDP(portIdx, modeIdx)) {
+                    cout << "print DP(portIdx:" << portIdx << ", modeIdx:" << modeIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_DP).toStyledString() << endl;
+                if ((line = getValue("configuration")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setDP(portIdx, modeIdx, "configuration", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_DP).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+				break;
+            case 88:
+                cout << "Enter port index >> ";
+                getline(cin, line);
+                portIdx = stringToInt(line);
+                cout << "Enter mode index >> ";
+                getline(cin, line);
+                modeIdx = stringToInt(line);
+                if (!Manager::instance()->getDP(portIdx, modeIdx)) {
+                    cout << "print DP(portIdx:" << portIdx << ", modeIdx:" << modeIdx << ") values failed" << endl;
+                    break;
+                }
+                cout << Manager::instance()->getList(DEVTYPE_DP).toStyledString() << endl;
+                if ((line = getValue("pin_assignment")).empty()) {
+                    break;
+                }
+                if (Manager::instance()->setDP(portIdx, modeIdx, "pin_assignment", line)) {
+                    cout << "retValue : true" << endl;
+                    cout << Manager::instance()->getList(DEVTYPE_DP).toStyledString() << endl;
+                }
+                else {
+                    cout << "retValue : false" << endl;
+                }
+				break;
             case 255:
                 break;
             default:
